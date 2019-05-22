@@ -3,10 +3,10 @@ pipeline {
     stages {
         stage ('build') {
             steps {
-                sh 'rm -rf /var/lib/jenkins/workspace/libfabrics-pipeline'
-                sh 'mkdir /var/lib/jenkins/workspace/libfabrics-pipeline'
+                sh 'rm -rf /var/lib/jenkins/workspace/libfabrics-pipbuild'
+                sh 'mkdir /var/lib/jenkins/workspace/libfabrics-pipbuild'
                 sh './autogen.sh'
-                sh './configure --prefix="/var/lib/jenkins/workspace/libfabrics-pipeline"'
+                sh './configure --prefix="/var/lib/jenkins/workspace/libfabrics-pipbuild"'
                 sh 'make && make install'
             }
         }
