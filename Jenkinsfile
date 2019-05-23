@@ -8,6 +8,7 @@ pipeline {
                 sh './autogen.sh'
                 sh './configure --prefix="/var/lib/jenkins/workspace/libfabrics-pipbuild"'
                 sh 'make && make install'
+                sh 'echo "Hello World" '
             }
         }
     }
