@@ -17,8 +17,9 @@ pipeline {
         success {
           sh 'echo "hello"'
         setBuildStatus("Build succeeded", "SUCCESS");
-    }
+        }
        failure {
         setBuildStatus("Build failed", "FAILURE");
-    }
+        }
+      }
 }
