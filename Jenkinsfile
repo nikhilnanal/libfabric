@@ -11,5 +11,13 @@ pipeline {
                 sh 'echo "Hello World" '
             }
         }
+      
+    }
+      post {
+        success {
+        setBuildStatus("Build succeeded", "SUCCESS");
+    }
+       failure {
+        setBuildStatus("Build failed", "FAILURE");
     }
 }
