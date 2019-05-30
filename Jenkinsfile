@@ -15,7 +15,7 @@ pipeline {
     }
       post {
         success {
-          sh 'echo hello'
+          sh 'echo "hello"'
         setBuildStatus("Build succeeded", "SUCCESS");
     }
        failure {
