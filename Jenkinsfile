@@ -12,8 +12,11 @@ pipeline {
         }
     }
     post {
-        success{
-                githubNotify description: 'This is a shorted example',  status: 'SUCCESS'
-        }
+        success {
+        setBuildStatus("Build succeeded", "SUCCESS");
+    }
+       failure {
+        setBuildStatus("Build failed", "FAILURE");
+    }
     }
 }
