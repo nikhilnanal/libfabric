@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
     stages {
         stage ('build') {
             steps {
@@ -10,15 +13,21 @@ pipeline {
                 sh 'make && make install'
                 sh 'echo "Hello World" '
             }
+            post {
+                success {
+                        sh 'echo "Built successfully"'
+                }
+                failure {
+                        sh ' echo "Build Failure"'   
+                }
+                pending {
+                     sh 'echo "Pending Build"'
+                }
+            }
         }
-      
+        stage('test') {
+            sh 'echo "to-do tests here" '
+        }
+        
     }
-      post {
-          success {
-        setBuildStatus("Build succeeded", "SUCCESS");
-        }
-       failure {
-        setBuildStatus("Build failed", "FAILURE");
-        }
-      }
 }
