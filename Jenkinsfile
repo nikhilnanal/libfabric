@@ -27,15 +27,5 @@ pipeline {
                 sh 'echo "to-do tests here" '
             }
         }
-        
-    }
-    post {
-        success {
-            sh 'echo "hello world"'
-        setBuildStatus("Build succeeded", "SUCCESS");
-    }
-       failure {
-        setBuildStatus("Build failed", "FAILURE");
-    }
     }
 }
