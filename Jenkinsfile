@@ -22,9 +22,14 @@ pipeline {
                 }
             }*/
         }
-        stage('test') {
+        stage('build-test') {
             steps {
                 sh 'echo "to-do tests here" '
+                sh 'cd fabtests'
+                sh './autogen.sh'
+                sh './configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
+                sh 'make && make install'
+                sh 'echo "Hello World 2"'
             }
         }
     }
