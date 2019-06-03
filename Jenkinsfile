@@ -13,14 +13,14 @@ pipeline {
                 sh 'make && make install'
                 sh 'echo "Hello World" '
             }
-            post {
+          /*  post {
                 success {
                         sh 'echo "Built successfully"'
                 }
                 failure {
                         sh ' echo "Build Failure"'   
                 }
-            }
+            }*/
         }
         stage('test') {
             steps {
