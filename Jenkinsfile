@@ -20,13 +20,12 @@ pipeline {
                 failure {
                         sh ' echo "Build Failure"'   
                 }
-                pending {
-                     sh 'echo "Pending Build"'
-                }
             }
         }
         stage('test') {
-            sh 'echo "to-do tests here" '
+            steps {
+                sh 'echo "to-do tests here" '
+            }
         }
         
     }
