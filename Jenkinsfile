@@ -25,7 +25,7 @@ pipeline {
         stage('test') {
             steps {
                 sh 'echo "to-do tests here" '
-                dh 'echo "looks like github integration plugin is doing the magic in the background"' 
+                sh 'echo "looks like github integration plugin is doing the magic in the background"' 
             }
         }
         
