@@ -36,6 +36,7 @@ pipeline {
             steps {
                 sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
             }
+        }
     }
         post {
             success {
