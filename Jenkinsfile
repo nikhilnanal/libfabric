@@ -32,5 +32,14 @@ pipeline {
                 sh 'echo "Hello World 2"'
             }
         }
+        stage ('execute-tests') {
+            steps {
+                sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
+            }
     }
+        post {
+            success {
+             githubNotify account: 'nikhilnanal', context: '', credentialsId: 'e9869883-1493-4950-b6be-05283212f145', description: '', gitApiUrl: '', repo: 'libfabric', sha: '', status: 'SUCCESS', targetUrl: ''
+            }
+        }
 }
