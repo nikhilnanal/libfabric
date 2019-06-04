@@ -34,7 +34,8 @@ pipeline {
         }
         stage ('execute-tests') {
             steps {
-                sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
+                   sh ' echo "execute-tests"'
+                // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
             }
         }
     }
