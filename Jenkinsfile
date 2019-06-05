@@ -42,9 +42,9 @@ pipeline {
             }
         }
     }
-    post {  
+  /*  post {  
         success{
           githubNotify account: 'nikhilnanal', context: '', credentialsId: $AN_ACCESS_KEY, description: 'pipelinesuccess', gitApiUrl: 'https://github.com/nikhilnanal/libfabric/blob/master/Jenkinsfile', repo: 'libfabric', sha: '', status: 'SUCCESS', targetUrl: 'http://sfs-login.jf.intel.com:8916/job/'
         }
-    }
+    }*/
 }
