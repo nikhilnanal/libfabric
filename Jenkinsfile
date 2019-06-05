@@ -39,9 +39,13 @@ pipeline {
             }
         }
     }
-        /* post {
+         post {
             success {
-             githubNotify account: 'nikhilnanal', context: '', credentialsId: 'e9869883-1493-4950-b6be-05283212f145', description: 'pipelinefailure', gitApiUrl: 'https://github.com/nikhilnanal/libfabric/blob/master/Jenkinsfile', repo: 'libfabric', sha: '', status: 'SUCCESS', targetUrl: 'http://sfs-login.jf.intel.com:8916/job/'
+                environment {
+                AN_ACCESS_KEY=credentials() //'e9869883-1493-4950-b6be-05283212f145'
+                }
+                githubNotify account: 'nikhilnanal', context: '', credentialsId: 'AN_ACCESS_KEY', description: 'pipelinefailure', gitApiUrl: 'https://github.com/nikhilnanal/libfabric/blob/master/Jenkinsfile', repo: 'libfabric', sha: '', status: 'SUCCESS', targetUrl: 'http://sfs-login.jf.intel.com:8916/job/'
+                
             }
-        }*/
+        }
 }
