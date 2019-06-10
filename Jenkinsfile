@@ -4,7 +4,7 @@ pipeline {
         pollSCM('H/2 * * * *')
     }
     environment {
-         AN_ACCESS_KEY=credentials() //'e9869883-1493-4950-b6be-05283212f145'
+         //AN_ACCESS_KEY=credentials() //'e9869883-1493-4950-b6be-05283212f145'
     }
     stages {
         stage ('build') {
@@ -27,12 +27,14 @@ pipeline {
         }
         stage('build-test') {
             steps {
-                sh 'echo "to-do tests here" '
-                sh 'cd fabtests'
-                sh './autogen.sh'
-                sh './configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"'
-                sh 'make && make install'
-                sh 'echo "Hello World 2"'
+                script {
+                    echo "to-do tests here"
+                    cd fabtests
+                    ./autogen.sh
+                    ./configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
+                    make && make install
+                    echo "Hello World 2"
+                }
             }
         }
         stage ('execute-tests') {
