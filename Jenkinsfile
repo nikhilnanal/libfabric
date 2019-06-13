@@ -37,7 +37,6 @@ pipeline {
                 '''
                 }
             }
-        }
         stage ('execute-tests') {
             steps {
                    sh ' echo "execute-tests"'
