@@ -27,13 +27,14 @@ pipeline {
         }
         stage('build-test') {
             steps {
-                script {
+                sh '''
                     echo "to-do tests here"
                     cd fabtests
                     ./autogen.sh
                     ./configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
                     make && make install
                     echo "Hello World 2"
+                '''
                 }
             }
         }
