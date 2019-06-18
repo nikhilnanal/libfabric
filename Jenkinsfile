@@ -3,9 +3,10 @@ pipeline {
     triggers {
         pollSCM('H/2 * * * *')
     }
-    /*environment {
+    environment {
          //AN_ACCESS_KEY=credentials() //'e9869883-1493-4950-b6be-05283212f145'
-    }*/
+         withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin'])
+    }
     stages {
         stage ('build') {
             steps {
