@@ -10,12 +10,14 @@ pipeline {
     stages {
         stage ('build') {
             steps {
+                withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh 'rm -rf /var/lib/jenkins/workspace/libfabrics-pipbuild'
                 sh 'mkdir /var/lib/jenkins/workspace/libfabrics-pipbuild'
                 sh './autogen.sh'
                 sh './configure --prefix="/var/lib/jenkins/workspace/libfabrics-pipbuild"'
                 sh 'make && make install'
                 sh 'echo "Hello World" '
+                }
             }
           /*  post {
                 success {
