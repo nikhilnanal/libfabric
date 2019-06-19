@@ -33,6 +33,9 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh '''
                     echo "to-do tests here"
+                    if [ -d "/var/lib/jenkins/workspace/libfabric-fabtests" ]; then
+                        rm -rf  /var/lib/jenkins/workspace/libfabric-fabtests/
+                    fi
                     cd fabtests
                     ./autogen.sh
                     ./configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
@@ -45,12 +48,12 @@ pipeline {
         stage ('execute-tests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
-
                    sh ''' 
                         echo "execute-tests"
                         cd ..
-                        ls -l
-                        cd libfabrics/
+                        ls -al
+                        cd libfabric-fabtests
+                        ls -al
                     '''
                 }
                 // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
