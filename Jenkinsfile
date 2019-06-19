@@ -46,7 +46,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
                    sh ' echo "execute-tests"'
-
+                   sh 'ls -l'
                    sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
                 }
                 // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
