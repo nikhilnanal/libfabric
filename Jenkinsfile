@@ -49,6 +49,7 @@ pipeline {
                         echo "execute-tests"
                         cd ..
                         ls -l
+                        cd libfabric-fabtest/
                     '''
                    
                 }
