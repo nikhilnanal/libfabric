@@ -48,6 +48,7 @@ pipeline {
                    sh ' echo "execute-tests"'
                    sh 'ls -l /var/lib/jenkins/workspace/'
                    sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests/'
+                   sh 'ls -l'
                 }
                 // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
             }
