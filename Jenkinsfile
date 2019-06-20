@@ -50,7 +50,8 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
                    sh ''' 
                         echo "execute-tests"
-                        cd /var/lib/jenkins/libfabric-fabtests/bin/
+                        cd ..
+                        cd libfabrics-fabtests/bin/
                         ls -al
                         ./runfabtests.sh --help
                     '''
