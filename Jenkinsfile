@@ -52,7 +52,8 @@ pipeline {
                    sh ''' 
                         echo "execute-tests"
                         cd ..
-                        if [ -d "libfabric-fabtests"]; then
+                        ls -al
+                        if [ -d "libfabric-fabtests" ]; then
                             cd libfabrics-fabtests
                             ls -al
                             if [ -d "bin" ]; then
