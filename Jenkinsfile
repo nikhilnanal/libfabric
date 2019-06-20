@@ -41,6 +41,8 @@ pipeline {
                     ./autogen.sh
                     ./configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
                     make && make install
+                    cd /var/lib/jenkins/workspace/libfabric-fabtests/
+                    ls
                     echo "Hello World 2"
                 '''
                 }
@@ -51,6 +53,8 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
                    sh ''' 
                         echo "execute-tests"
+                        echo "workspace is:" 
+                        echo $WORKSPACE
                         cd ..
                         ls -al
                         if [ -d "libfabric-fabtests" ]; then
