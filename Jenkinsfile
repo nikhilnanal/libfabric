@@ -39,9 +39,10 @@ pipeline {
                     fi
                     cd fabtests
                     ./autogen.sh
-                    ./configure --prefix="/var/lib/jenkins/workspace/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
+                    rm -rf $WORKSPACE/libfabrics-fabtests
+                    ./configure --prefix="$WORKSPACE/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
                     make && make install
-                    cd /var/lib/jenkins/workspace/libfabric-fabtests/
+                    cd /$WORKSPACE/libfabric-fabtests/
                     ls
                     echo "Hello World 2"
                 '''
@@ -53,11 +54,9 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
                    sh ''' 
                         echo "execute-tests"
-                        echo "workspace is:" 
-                        echo $WORKSPACE
-                        cd ..
+                        cd libfabric-fabtests/bin/               
                         ls -al
-                        if [ -d "libfabric-fabtests" ]; then
+                      /*  if [ -d "libfabric-fabtests" ]; then
                             cd libfabrics-fabtests
                             ls -al
                             if [ -d "bin" ]; then
@@ -70,7 +69,7 @@ pipeline {
                             fi
                         else
                                 echo "error 2!!!"
-                        fi
+                        fi*/
                     '''
                 }
                 // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
