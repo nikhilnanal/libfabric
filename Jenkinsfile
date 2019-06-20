@@ -34,6 +34,7 @@ pipeline {
                 sh '''
                     echo "to-do tests here"
                     if [ -d "/var/lib/jenkins/workspace/libfabric-fabtests" ]; then
+                        echo "found fabtests installdir"
                         rm -rf  /var/lib/jenkins/workspace/libfabric-fabtests/
                     fi
                     cd fabtests
@@ -51,9 +52,16 @@ pipeline {
                    sh ''' 
                         echo "execute-tests"
                         cd ..
-                        cd libfabrics-fabtests/bin/
+                        cd libfabrics-fabtests
                         ls -al
-                        ./runfabtests.sh --help
+                        if [ -d "bin" ]; then
+                           cd bin
+                           echo "entering bin"
+                           ls -al
+                           ./runfabtests.sh --help
+                         else
+                            echo "error!!!"
+                         fi
                     '''
                 }
                 // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
