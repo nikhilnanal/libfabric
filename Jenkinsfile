@@ -55,21 +55,8 @@ pipeline {
                    sh ''' 
                         echo "execute-tests"
                         cd libfabric-fabtests/bin/               
-                        ls -al
-                      /*  if [ -d "libfabric-fabtests" ]; then
-                            cd libfabrics-fabtests
-                            ls -al
-                            if [ -d "bin" ]; then
-                                cd bin
-                                echo "entering bin"
-                                ls -al
-                                ./runfabtests.sh --help
-                            else
-                                echo "error 1!!!"
-                            fi
-                        else
-                                echo "error 2!!!"
-                        fi*/
+                        ./runfabtests.sh --help
+                 
                     '''
                 }
                 // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
