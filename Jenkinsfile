@@ -55,7 +55,7 @@ pipeline {
                    sh ''' 
                         echo "execute-tests"
                         cd libfabric-fabtests/bin/               
-                        ./runfabtests.sh
+                        ./runfabtests.sh -vvv -p $WORKSPACE/libfabric-fabtests/bin/ -S -t all -R -f $WORKSPACE/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n51 n52
                          echo "The return status of runfabtests.sh is :"
                          echo $?
                          
