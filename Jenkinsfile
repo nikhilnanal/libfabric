@@ -56,7 +56,9 @@ pipeline {
                         echo "execute-tests"
                         cd libfabric-fabtests/bin/               
                         ./runfabtests.sh
-                        echo $?
+                         echo "The return status of runfabtests.sh is :"
+                         echo $?
+                         
                  
                     '''
                 }
