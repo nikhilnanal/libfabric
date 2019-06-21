@@ -56,6 +56,7 @@ pipeline {
                         echo "execute-tests"
                         cd libfabric-fabtests/bin/               
                         ./runfabtests.sh
+                        echo $?
                  
                     '''
                 }
