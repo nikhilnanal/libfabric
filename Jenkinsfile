@@ -32,12 +32,9 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh '''
-                    echo "to-do tests here"
-                /*    if [ -d "$WORKSPACE/libfabric-fabtests" ]; then
-                        echo "found fabtests installdir"
-                        rm -rf  $WORKSPACE/libfabric-fabtests/
-                    fi
-                */
+                    echo "to-do tests here"    
+                    rm -rf  /home/build/jenkinsbuild/workspace/libfabric-fabtests/
+            
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
          //rm -rf /home/build/jenkinsbuild/workspace/libfabrics-fabtests
