@@ -11,10 +11,10 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-                sh 'rm -rf /var/lib/jenkins/workspace/libfabrics-pipbuild'
-                sh 'mkdir /var/lib/jenkins/workspace/libfabrics-pipbuild'
+                sh 'rm -rf /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
+                sh 'mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
                 sh './autogen.sh'
-                sh './configure --prefix="/var/lib/jenkins/workspace/libfabrics-pipbuild"'
+                sh './configure --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"'
                 sh 'make && make install'
                 sh 'echo "Hello World" '
                 }
@@ -33,14 +33,14 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh '''
                     echo "to-do tests here"
-                    if [ -d "/var/lib/jenkins/workspace/libfabric-fabtests" ]; then
+                    if [ -d "/home/build/jenkinsbuild/workspace/libfabric-fabtests" ]; then
                         echo "found fabtests installdir"
-                        rm -rf  /var/lib/jenkins/workspace/libfabric-fabtests/
+                        rm -rf  /home/build/jenkinsbuild/workspace/libfabric-fabtests/
                     fi
-                    cd fabtests
+                    cd /home/build/jenkins/fabtests
                     ./autogen.sh
                     rm -rf $WORKSPACE/libfabrics-fabtests
-                    ./configure --prefix="$WORKSPACE/libfabric-fabtests" --with-libfabric="/var/lib/jenkins/workspace/libfabrics-pipbuild"
+                    ./configure --prefix="home/build/jenkinsbuild/workspace/libfabric-fabtests" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"
                     make && make install
                     cd /$WORKSPACE/libfabric-fabtests/
                     ls
@@ -54,8 +54,8 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
                    sh ''' 
                         echo "execute-tests"
-                        cd libfabric-fabtests/bin/               
-                        ./runfabtests.sh -vvv -p $WORKSPACE/libfabric-fabtests/bin/ -S -t all -R -f $WORKSPACE/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n51 n52
+                        cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/               
+                        ./runfabtests.sh -vvv -p /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/ -S -t all -R -f /home/build/jenkinsbuild/workspace/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n51 n52
                          echo "The return status of runfabtests.sh is :"
                          echo $?
                          
