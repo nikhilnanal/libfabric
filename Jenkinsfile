@@ -37,13 +37,13 @@ pipeline {
                         echo "found fabtests installdir"
                         rm -rf  /home/build/jenkinsbuild/workspace/libfabric-fabtests/
                     fi
-                    cd /home/build/jenkins/fabtests
+                    cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/fabtests
                     ./autogen.sh
-                    rm -rf $WORKSPACE/libfabrics-fabtests
+         //rm -rf /home/build/jenkinsbuild/workspace/libfabrics-fabtests
                     ./configure --prefix="home/build/jenkinsbuild/workspace/libfabric-fabtests" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"
                     make && make install
-                    cd /$WORKSPACE/libfabric-fabtests/
-                    ls
+                    cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/
+                    ls -l
                     echo "Hello World 2"
                 '''
                 }
