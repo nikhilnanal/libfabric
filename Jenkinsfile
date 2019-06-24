@@ -37,7 +37,6 @@ pipeline {
             
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
-         //rm -rf /home/build/jenkinsbuild/workspace/libfabrics-fabtests
                     ./configure --prefix="home/build/jenkinsbuild/workspace/libfabric-fabtests" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"
                     make && make install
                     cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/
