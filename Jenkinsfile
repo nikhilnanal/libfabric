@@ -33,11 +33,12 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh '''
                     echo "to-do tests here"
-                    if [ -d "/home/build/jenkinsbuild/workspace/libfabric-fabtests" ]; then
+                /*    if [ -d "$WORKSPACE/libfabric-fabtests" ]; then
                         echo "found fabtests installdir"
-                        rm -rf  /home/build/jenkinsbuild/workspace/libfabric-fabtests/
+                        rm -rf  $WORKSPACE/libfabric-fabtests/
                     fi
-                    cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/fabtests
+                */
+                    cd $WORKSPACE/fabtests
                     ./autogen.sh
          //rm -rf /home/build/jenkinsbuild/workspace/libfabrics-fabtests
                     ./configure --prefix="home/build/jenkinsbuild/workspace/libfabric-fabtests" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"
