@@ -54,7 +54,7 @@ pipeline {
                    sh ''' 
                         echo "execute-tests"
                         cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/               
-                        ./runfabtests.sh -vvv -p /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/ -S -t all -R -f /home/build/jenkinsbuild/workspace/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n105 n106
+                        ./runfabtests.sh -vvv -p /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/ -S -t all -R -f /home/build/jenkinsbuild/workspace/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n105 n107
                          echo "The return status of runfabtests.sh is :"
                          echo $?
                          
