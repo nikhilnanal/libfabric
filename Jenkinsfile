@@ -15,6 +15,7 @@ pipeline {
                 sh 'mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
                 sh './autogen.sh'
                 sh './configure --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"'
+                sh  'make clean' 
                 sh 'make && make install'
                 sh 'echo "Hello World" '
                 }
@@ -38,6 +39,7 @@ pipeline {
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
                     ./configure --prefix="/home/build/jenkinsbuild/workspace/libfabric-fabtests" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"
+                    make clean
                     make && make install
                     cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/
                     ls -l
