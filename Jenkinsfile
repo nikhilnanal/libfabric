@@ -12,9 +12,9 @@ pipeline {
              steps {
                  withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                      dir('opa-psm2-lib') {
-                        //checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1024568c-672f-4132-8dab-65c437b8655e', url: 'https://github.com/nikhilnanal/opa-psm2.git']]]
+                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1024568c-672f-4132-8dab-65c437b8655e', url: 'https://github.com/nikhilnanal/opa-psm2.git']]]
                       sh '''
-                            pwd
+                         pwd   
                        '''
                       }
                  }
