@@ -27,7 +27,7 @@ pipeline {
                 sh 'rm -rf /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
                 sh 'mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
                 sh './autogen.sh'
-                sh './configure --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild" --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+                sh './configure --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild" --with-psm2-src="$WORKSPACE/opa-psm2-lib"'
                 sh  'make clean' 
                 sh 'make && make install'
                 sh 'echo "Hello World" '
