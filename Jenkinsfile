@@ -9,11 +9,11 @@ pipeline {
     }*/
     stages {
         stage ('fetch-opa-psm2')  {
-          dir('opa-psm2-lib') {
-              checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1024568c-672f-4132-8dab-65c437b8655e', url: 'https://github.com/nikhilnanal/opa-psm2.git']]]
-              steps {
-                  sh '''
-                    echo 'build opa-psm2'
+             steps {
+                 dir('opa-psm2-lib') {
+                 //checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1024568c-672f-4132-8dab-65c437b8655e', url: 'https://github.com/nikhilnanal/opa-psm2.git']]]
+                 sh '''
+                    pwd
                  '''
               }
           }
