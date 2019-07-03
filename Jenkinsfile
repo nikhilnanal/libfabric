@@ -67,7 +67,7 @@ pipeline {
                    sh ''' 
                         echo "execute-tests"
                         cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/
-                         .//home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/fi_info -p psm2
+                         ./fi_info -p psm2
                         ./runfabtests.sh -vvv -p /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/ -S -t all -R -f /home/build/jenkinsbuild/workspace/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n105 n107
                         .//home/build/ssg_sfi-buildbot/scripts/run_impi.sh -n 4 -ppn 2 -hosts n105,n107 -mpi_root=/home/build/intel/impi_2019.0.4 -libfabric_path=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib -prov psm2 /home/build/intel/impi_2019.0.4/intel64/bin/IMB-MPI1 -include Biband,Uniband,PingPingAnySource,PingPingAnySource,PingPongSpecificSource,PingPongSpecificSource
                         echo "The return status of runfabtests.sh is :"
