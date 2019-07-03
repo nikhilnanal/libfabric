@@ -72,7 +72,8 @@ pipeline {
                         ./runfabtests.sh -vvv -p /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/ -S -t all -R -f /home/build/jenkinsbuild/workspace/libfabric-fabtests/share/fabtests/test_configs/psm2/psm2.exclude psm2 n105 n107
                         cd /home/build/ssg_sfi-buildbot/scripts/
                         ./run_impi.sh -n 4 -ppn 2 -hosts n105,n107 -mpi_root=/home/build/intel/impi_2019.0.4 -libfabric_path=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib -prov psm2 /home/build/intel/impi_2019.0.4/intel64/bin/IMB-MPI1 -include Biband,Uniband,PingPingAnySource,PingPingAnySource,PingPongSpecificSource,PingPongSpecificSource
-                        echo "The return status of runfabtests.sh is :"
+                        ./run_impi.sh -n 16 -ppn 8 -hosts n105,n107 -mpi_root=/home/build/intel/impi_2019.0.4 -libfabric_path=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib -prov psm2 /home/build/buildbot/install/ofi/ofi_rhel7-debug/10/impi/stress/mpi_stress -dcr
+                         echo "The return status of runfabtests.sh is :"
                          echo $?
                          
                  
