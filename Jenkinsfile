@@ -80,6 +80,18 @@ pipeline {
 		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
 		   git clone --depth 1 https://github.com/ParRes/ISx.git ISx && cd ISx/SHMEM
 		   make CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc LDLIBS=-lm
+		   
+		   #build PRK
+		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
+		   git clone --depth 1 https://github.com/ParRes/Kernels.git PRK && cd PRK
+		   echo -e 'SHMEMCC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc -std=c99 SHMEMTOP=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/SOS' > common/make.defs
+		   make allshmem
+		   
+		   #build test-uh
+		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
+		   git clone --depth 1 https://github.com/openshmem-org/tests-uh.git tests-uh && cd tests-uh
+		   PATH=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin:$PATH make -j4 C_feature_tests
+		   
                 '''
               }
             }
