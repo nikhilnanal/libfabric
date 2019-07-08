@@ -71,10 +71,15 @@ pipeline {
                    cd  /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
                    mkdir SOS && tar -xf /home/build/v1.4.2.tar.gz -C SOS --strip-components 1 && cd SOS
                    ./autogen.sh
-		           ./configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem --disable-fortran --enable-remote-virtual-addressing --disable-aslr-check --enable-pmi-simple --with-ofi=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ LDFLAGS="-fno-pie"
-		           make -j4
-		           make check TESTS=
-		           make install
+		   ./configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem --disable-fortran --enable-remote-virtual-addressing --disable-aslr-check --enable-pmi-simple --with-ofi=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ LDFLAGS="-fno-pie"
+		   make -j4
+		   make check TESTS=
+		   make install
+		   
+		   #build ISx
+		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
+		   git clone --depth 1 https://github.com/ParRes/ISx.git ISx && cd ISx/SHMEM
+		   make CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc LDLIBS=-lm
                 '''
               }
             }
