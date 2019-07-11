@@ -92,6 +92,14 @@ pipeline {
 		   git clone --depth 1 https://github.com/openshmem-org/tests-uh.git tests-uh && cd tests-uh
 		   PATH=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin:$PATH make -j4 C_feature_tests
 		   
+		   #build ompi benchmarks
+		   cd $WORKSPACE
+		   /home/build/scm/ompi_4.0.1/configure --disable-oshmem --enable-mpi-fortran=no --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi --with-libfabric=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/
+		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi
+		   make install -j32
+		   
+		   #build mpi stress test with ompi
+		 # mkdir -p /home/build/buildbot/install/ofi/ofi_rhel7/06/ompi/stress && LD_LIBRARY_PATH= /home/build/buildbot/install/ofi/ofi_rhel7/06/ompi/bin/mpicc -lz ./mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress/mpi_stress
                 '''
               }
             }
