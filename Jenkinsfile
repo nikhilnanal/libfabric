@@ -94,8 +94,8 @@ pipeline {
 		   
 		   #build ompi benchmarks
 		   cd $WORKSPACE
+		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/
 		   /home/build/scm/ompi_4.0.1/configure --disable-oshmem --enable-mpi-fortran=no --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi --with-libfabric=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/
-		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi
 		   make install -j32
 		   
 		   #build mpi stress test with ompi
