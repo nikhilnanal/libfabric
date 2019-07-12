@@ -104,7 +104,13 @@ pipeline {
 		   
 		   #build osu benchmarks with ompi
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu
-		   
+		   export CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicc
+		   export CXX=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicxx
+		   export CFLAGS="-I/home/build/scm/osu-micro-benchmarks-5.5/util/"
+		   export LD_LIBRARY_PATH=""
+		   /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/buildbot/install/ofi/ofi_rhel7/08/ompi/osu
+		   make -j4
+		   make install
                 '''
               }
             }
