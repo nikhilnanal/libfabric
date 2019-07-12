@@ -99,7 +99,7 @@ pipeline {
 		   make install -j32
 		   
 		   #build mpi stress test with ompi
-		 # mkdir -p /home/build/buildbot/install/ofi/ofi_rhel7/06/ompi/stress && LD_LIBRARY_PATH= /home/build/buildbot/install/ofi/ofi_rhel7/06/ompi/bin/mpicc -lz ./mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress/mpi_stress
+		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress && LD_LIBRARY_PATH=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress/mpi_stress
                 '''
               }
             }
@@ -108,7 +108,7 @@ pipeline {
         stage ('execute-tests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
-                   sh ''' 
+              /*     sh ''' 
                         echo "execute-tests"
                         cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/
                         pwd
@@ -123,7 +123,8 @@ pipeline {
                  
                     '''
                 }
-                // sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
+                */ 
+		// sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
             }
         }
     }
