@@ -122,8 +122,9 @@ pipeline {
                          
                  
                     '''
+		    */
                 }
-                */ 
+                
 		// sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
             }
         }
