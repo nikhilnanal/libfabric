@@ -126,7 +126,12 @@ pipeline {
 		    make -j4
 		    make install
 		    
-		    
+		    #build mpich
+		    #build ompi
+		    cd $WORKSPACE
+		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/
+		    /home/build/scm/mpich/configure --disable-oshmem --enable-fortran=no --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich --with-libfabric=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/
+		    make install -j32
                 '''
               }
             }
