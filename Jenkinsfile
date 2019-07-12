@@ -122,14 +122,14 @@ pipeline {
 		    export CXX=/home/build/intel/impi_2019.0.4/intel64/bin/mpicxx
 		    export CFLAGS="-I/home/build/scm/osu-micro-benchmarks-5.5/util/"
 		    export LD_LIBRARY_PATH="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib"
-		    /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/buildbot/install/ofi/ofi_rhel7/08/impi/osu
+		    /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/osu
 		    make -j4
 		    make install
 		    
 		    #build mpich
 		    cd $WORKSPACE
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/
-		    /home/build/scm/mpich/configure --disable-oshmem --enable-fortran=no --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich --with-libfabric=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/
+		    /home/build/scm/mpich/configure --disable-oshmem --enable-fortran=no --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
 		    make install -j32
 		    
 		    #build mpi stress test with mpich
