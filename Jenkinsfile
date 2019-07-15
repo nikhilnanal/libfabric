@@ -93,16 +93,19 @@ pipeline {
 		   PATH=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin:$PATH make -j4 C_feature_tests
 		   
 		   #build ompi
+		   (
 		   cd $WORKSPACE
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/
 		   /home/build/scm/ompi_4.0.1/configure --disable-oshmem --enable-mpi-fortran=no --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi --with-libfabric=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/
 		   make install -j32
-		   
+		   )
 		   #build mpi stress test with ompi
+		   (
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress && LD_LIBRARY_PATH=""
 		   /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress/mpi_stress
-		   
+		   )
 		   #build osu benchmarks with ompi
+		   (
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu
 		   export CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicc
 		   export CXX=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicxx
@@ -111,12 +114,14 @@ pipeline {
 		   /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu
 		   make -j4
 		   make install
-		   
+		   )
 		   #build mpi stress test with Intel MPI
+		   (
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/stress && LD_LIBRARY_PATH="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib"
 		   /home/build/intel/impi_2019.0.4/intel64/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/stress/mpi_stress
-		  
+		   )
 		   #build osu benchmarks with Intel MPI
+		    (
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/osu && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/osu
 		    export CC=/home/build/intel/impi_2019.0.4/intel64/bin/mpicc
 		    export CXX=/home/build/intel/impi_2019.0.4/intel64/bin/mpicxx
@@ -125,20 +130,23 @@ pipeline {
 		    /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/osu
 		    make -j4
 		    make install
-		    
+		    )
 		    #build mpich
+		    (
 		    cd $WORKSPACE
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich_build/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich_build/
 		    /home/build/scm/mpich/configure --disable-oshmem --enable-fortran=no --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
 		    make clean
 		    make install -j32
+		    )
 		    
 		    #build mpi stress test with mpich
-		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress && LD_LIBRARY_PATH=""
+		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress 
 		    /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress/mpi_stress
 		    
 		    #build osu benchmarks with mpich
+		    (
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/osu && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/osu
 		    export CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicc
 		    export CXX=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicxx
@@ -147,6 +155,7 @@ pipeline {
 		    /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/osu
 		    make -j4
 		    make install
+		    )
                 '''
               }
             }
