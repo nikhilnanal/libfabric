@@ -61,7 +61,7 @@ pipeline {
                 }
                 }
             }
-        stage ('build-benchmarks') {
+        stage ('build-shmem') {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh '''
@@ -91,8 +91,13 @@ pipeline {
 		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
 		   git clone --depth 1 https://github.com/openshmem-org/tests-uh.git tests-uh && cd tests-uh
 		   PATH=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin:$PATH make -j4 C_feature_tests
-		   
-		   #build ompi
+	      }
+	    }
+	}
+        stage('build ompi + benchmarks')  {
+	    steps {
+              withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                sh '''
 		   (
 		   cd $WORKSPACE
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/
@@ -115,6 +120,15 @@ pipeline {
 		   make -j4
 		   make install
 		   )
+		   '''
+	      }
+	    }
+	}
+	
+	stage('build Intel MPI + benchmarks') {
+	    steps {
+	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                sh '''
 		   #build mpi stress test with Intel MPI
 		   (
 		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/impi/stress && LD_LIBRARY_PATH="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib"
@@ -131,6 +145,15 @@ pipeline {
 		    make -j4
 		    make install
 		    )
+		   '''
+	      }
+	    }
+	}  
+	
+	stage('build MPICH + Benchmarks') {
+	    steps {
+	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                sh '''
 		    #build mpich
 		    (
 		    cd $WORKSPACE
@@ -140,7 +163,7 @@ pipeline {
 		    make clean
 		    make install -j32
 		    )
-		    
+
 		    #build mpi stress test with mpich
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress 
 		    /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress/mpi_stress
