@@ -131,6 +131,7 @@ pipeline {
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich
 		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich_build/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich_build/
 		    /home/build/scm/mpich/configure --disable-oshmem --enable-fortran=no --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
+		    make clean
 		    make install -j32
 		    
 		    #build mpi stress test with mpich
