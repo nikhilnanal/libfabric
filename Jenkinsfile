@@ -195,7 +195,7 @@ pipeline {
             }
         }
                     
-        stage ('execute-tests') {
+        stage ('execute-hfi-psm2-tests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
                   /*sh ''' 
@@ -234,21 +234,26 @@ pipeline {
 			)
 			
 			(
-			 set -e
-			 install_path="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
-			 cd /home/build/ssg_sfi-buildbot/scripts/
-			 launchern='./run_mpich.sh -n 4 -ppn 2 -hosts n59,n60 -mpi_root=/home/build/buildbot/install/ofi/ofi_rhel7/12/mpich -libfabric_path=/home/build/buildbot/install/ofi/ofi_rhel7/12/lib -prov psm2'
-			 launcher2='./run_mpich.sh -n 2 -ppn 1 -hosts n59,n60 -mpi_root=/home/build/buildbot/install/ofi/ofi_rhel7/12/mpich -libfabric_path=/home/build/buildbot/install/ofi/ofi_rhel7/12/lib -prov psm2'
-			 two_proc_test_pattern='osu_latency|osu_bibw|osu_latency_mt|osu_bw|osu_get_latency|osu_fop_latency|osu_acc_latency|osu_get_bw|osu_put_latency|osu_put_bw|osu_put_bibw|osu_cas_latency|osu_get_acc_latency'
-			 for cmd in $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/startup/osu_hello $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/startup/osu_init $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_mbw_mr /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_multi_lat /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency_mt /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_gatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_alltoall /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iscatter /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_scatter /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_reduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_igather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iallreduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ialltoall /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ireduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iscatterv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_allgather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iallgather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_reduce_scatter /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_gather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_allgatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ialltoallv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_barrier /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ialltoallw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_scatterv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_bcast /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iallgatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ibcast /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_igatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ibarrier /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_alltoallv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_bw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_bw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_bibw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_cas_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency; do
-				if [[ $cmd =~ $two_proc_test_pattern ]]; then
-					launcher=$launcher2
-				else
-					launcher=$launchern
-				fi
-				(set -x; eval $launcher $cmd)	# Doesn't work without eval!
-			done
-		      )
+			  set -e
+			  install_path="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
+			  cd /home/build/ssg_sfi-buildbot/scripts/
+			  launchern='./run_mpich.sh -n 4 -ppn 2 -hosts n105,n107 -mpi_root=/home/build/buildbot/install/ofi/ofi_rhel7/12/mpich -libfabric_path=/home/build/buildbot/install/ofi/ofi_rhel7/12/lib -prov psm2'
+			  launcher2='./run_mpich.sh -n 2 -ppn 1 -hosts n105,n107 -mpi_root=/home/build/buildbot/install/ofi/ofi_rhel7/12/mpich -libfabric_path=/home/build/buildbot/install/ofi/ofi_rhel7/12/lib -prov psm2'
+			  two_proc_test_pattern='osu_latency|osu_bibw|osu_latency_mt|osu_bw|osu_get_latency|osu_fop_latency|osu_acc_latency|osu_get_bw|osu_put_latency|osu_put_bw|osu_put_bibw|osu_cas_latency|osu_get_acc_latency'
+			   for cmd in $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/startup/osu_hello $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/startup/osu_init $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency $install_path/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_mbw_mr /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bibw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_multi_lat /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency_mt /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_bw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_gatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_alltoall /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iscatter /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_scatter /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_reduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_igather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iallreduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ialltoall /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ireduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iscatterv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_allgather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_allreduce /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iallgather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_reduce_scatter /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_gather /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_allgatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ialltoallv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_barrier /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ialltoallw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_scatterv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_bcast /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_iallgatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ibcast /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_igatherv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_ibarrier /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/collective/osu_alltoallv /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_fop_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_acc_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_bw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_bw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_put_bibw /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_cas_latency /home/build/buildbot/install/ofi/ofi_rhel7/12/mpich/osu/libexec/osu-micro-benchmarks/mpi/one-sided/osu_get_acc_latency; do
+				 if [[ $cmd =~ $two_proc_test_pattern ]]; then
+				 	 launcher=$launcher2
+				 else
+					 launcher=$launchern
+				 fi
+				 (set -x; eval $launcher $cmd)	# Doesn't work without eval!
+			    done
+		       )
+		       (
+		       #ompi - mpi stress test
+		        install_path="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
+		       	$install_path/ompi/bin/mpirun -np 16 --host n105:8,n107:8 --mca mtl_ofi_provider_include psm2 --mca orte_base_help_aggregate 0 --mca mtl ofi --mca pml cm -tag-output $install_path/ompi/stress/mpi_stress -dcr
+		       )	
 			
 			echo "The return status of runfabtests.sh is :"
                          echo $?
@@ -260,6 +265,16 @@ pipeline {
 		// sh 'cd /var/lib/jenkins/worksapce/libfabric-fabtests'
             }
         }
+	    
+	stage ('execute-hfi-rxd-verbs-tests') {
+            steps {
+                withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){    
+		   sh '''
+			echo 'hello'	
+		   '''		
+		}
+	    }
+	}
     }
   /*  post {  
         success{
