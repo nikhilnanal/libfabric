@@ -85,10 +85,10 @@ pipeline {
 		   make CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc LDLIBS=-lm
 		   )
 		   #build PRK
-		  # cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
-		  # git clone --depth 1 https://github.com/ParRes/Kernels.git PRK && cd PRK
-		  # echo -e 'SHMEMCC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc -std=c99 SHMEMTOP=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/SOS' > common/make.defs
-		  # make allshmem
+		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
+		   git clone --depth 1 https://github.com/ParRes/Kernels.git PRK && cd PRK
+		   echo -e 'SHMEMCC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc -std=c99 SHMEMTOP=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/SOS' > common/make.defs
+		   make allshmem
 		   
 		   #build test-uh
 		   (
@@ -270,7 +270,12 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){    
 		   sh '''
-			echo 'hello'	
+		   	install_path="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
+		   	cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/
+                        pwd
+			./runfabtests.sh -vvv -p $install_path/bin -S -s n105-hfi1_0_1 -c n107-hfi1_0_1 -t all -R -f $install_path/share/fabtests/test_configs/ofi_rxd/ofi_rxd.exclude -E FI_VERBS_MR_CACHE_ENABLE=1 -E FI_VERBS_INLINE_SIZE=256 "verbs;ofi_rxd" 			   n105 n107
+			
+	
 		   '''		
 		}
 	    }
