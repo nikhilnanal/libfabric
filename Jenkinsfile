@@ -25,6 +25,7 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
+			sh ' echo ${PULL_REQUEST}'
                 sh 'rm -rf /home/build/ofi-Install/libfabric'
 			sh 'mkdir -p /home/build/ofi-Install/libfabric/{$PULL_REQUEST}'
                 sh './autogen.sh'
@@ -41,7 +42,7 @@ pipeline {
                 sh '''
                     echo "to-do tests here"    
                     rm -rf  /home/build/ofi-Install/libfabric-fabtests/
-            
+            	    
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
                     ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric/{$PULL_REQUEST}/"
