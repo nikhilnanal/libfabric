@@ -87,7 +87,7 @@ pipeline {
 		   #build PRK
 		   cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem
 		   git clone --depth 1 https://github.com/ParRes/Kernels.git PRK && cd PRK
-		   echo -e 'SHMEMCC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc -std=c99 SHMEMTOP=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/SOS' > common/make.defs
+		   echo -e 'SHMEMCC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/bin/oshcc -std=c99\nSHMEMTOP=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/shmem/SOS\n' > common/make.defs
 		   make allshmem
 		   
 		   #build test-uh
