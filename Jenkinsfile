@@ -33,14 +33,6 @@ pipeline {
                 sh 'echo "Hello World" '
                 }
             }
-          /*  post {
-                success {
-                        sh 'echo "Built successfully"'
-                }
-                failure {
-                        sh ' echo "Build Failure"'   
-                }
-            }*/
         }
         stage('build-fabtests') {
             steps {
@@ -61,6 +53,7 @@ pipeline {
                 }
                 }
             }
+/*	    
         stage ('build-shmem') {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
@@ -207,7 +200,7 @@ pipeline {
                         cd /home/build/ssg_sfi-buildbot/scripts/
                         ./run_impi.sh -n 4 -ppn 2 -hosts n105,n107 -mpi_root=/home/build/intel/impi_2019.0.4 -libfabric_path=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib -prov psm2 /home/build/intel/impi_2019.0.4/intel64/bin/IMB-MPI1 -include Biband,Uniband,PingPingAnySource,PingPingAnySource,PingPongSpecificSource,PingPongSpecificSource
                         ./run_impi.sh -n 16 -ppn 8 -hosts n105,n107 -mpi_root=/home/build/intel/impi_2019.0.4 -libfabric_path=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/lib -prov psm2 /home/build/buildbot/install/ofi/ofi_rhel7-debug/10/impi/stress/mpi_stress -dcr
-                    */
+                    
 			sh '''
 			(
 			   set -e
@@ -279,7 +272,7 @@ pipeline {
 		   '''		
 		}
 	    }
-	}
+	}*/
     }
   /*  post {  
         success{
