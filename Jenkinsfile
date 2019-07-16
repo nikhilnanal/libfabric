@@ -7,6 +7,7 @@ pipeline {
          //AN_ACCESS_KEY=credentials() //'e9869883-1493-4950-b6be-05283212f145'
          withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin'])
     }*/
+   def PULL_REQUEST = env.CHANGE_ID
     stages {
         stage ('fetch-opa-psm2')  {
              steps {
@@ -25,9 +26,9 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh 'rm -rf /home/build/ofi-Install/libfabric'
-                sh 'mkdir -p /home/build/ofi-Install/libfabric'
+			sh 'mkdir -p /home/build/ofi-Install/libfabric/{$PULL_REQUEST}'
                 sh './autogen.sh'
-                sh './configure --prefix="/home/build/ofi-Install/libfabric" --with-psm2-src="$WORKSPACE/opa-psm2-lib"'
+			sh './configure --prefix="/home/build/ofi-Install/libfabric/{$PULL_REQUEST}" --with-psm2-src="$WORKSPACE/opa-psm2-lib"'
                 sh  'make clean' 
                 sh 'make && make install'
                 sh 'echo "Hello World" '
@@ -43,7 +44,7 @@ pipeline {
             
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric"
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric/{$PULL_REQUEST}/"
                     make clean
                     make && make install
                     cd /home/build/ofi-Install/libfabric-fabtests/
