@@ -24,10 +24,10 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-                sh 'rm -rf /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
-                sh 'mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild'
+                sh 'rm -rf /home/build/ofi-Install/libfabric'
+                sh 'mkdir -p /home/build/ofi-Install/libfabric'
                 sh './autogen.sh'
-                sh './configure --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild" --with-psm2-src="$WORKSPACE/opa-psm2-lib"'
+                sh './configure --prefix="/home/build/ofi-Install/libfabric" --with-psm2-src="$WORKSPACE/opa-psm2-lib"'
                 sh  'make clean' 
                 sh 'make && make install'
                 sh 'echo "Hello World" '
@@ -39,14 +39,14 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh '''
                     echo "to-do tests here"    
-                    rm -rf  /home/build/jenkinsbuild/workspace/libfabric-fabtests/
+                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/
             
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/jenkinsbuild/workspace/libfabric-fabtests" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild"
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric"
                     make clean
                     make && make install
-                    cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/
+                    cd /home/build/ofi-Install/libfabric-fabtests/
                     ls -l
                     echo "Hello World 2"
                 '''
