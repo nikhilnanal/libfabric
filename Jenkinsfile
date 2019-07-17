@@ -25,9 +25,9 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-		sh '''
-		echo "${env.BUILD_NUMBER}"
-		PRNUM="\${env.BUILD_NUMBER}"
+		sh """
+		echo ${env.BUILD_NUMBER}
+		PRNUM=${env.BUILD_NUMBER}
                 rm -rf /home/build/ofi-Install/libfabric'
 		mkdir -p "/home/build/ofi-Install/libfabric/$PRNUM"
                 ./autogen.sh
@@ -35,17 +35,17 @@ pipeline {
                 make clean 
                 make && make install
                 echo "Hello World"
-	        '''
+	        """
                 }
             }
         }
         stage('build-fabtests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-                sh '''
+                sh """
                     echo "to-do tests here"    
                     rm -rf  /home/build/ofi-Install/libfabric-fabtests/
-            	    PRNUM="\${env.BUILD_NUMBER}"
+            	    PRNUM=${env.BUILD_NUMBER}
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
                     ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric/$PRNUM"
@@ -54,7 +54,7 @@ pipeline {
                     cd /home/build/ofi-Install/libfabric-fabtests/
                     ls -l
                     echo "Hello World 2"
-                '''
+                """
                 }
                 }
             }
