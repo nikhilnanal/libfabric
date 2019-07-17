@@ -27,10 +27,11 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
 		sh """
 		echo ${env.BUILD_NUMBER}
+		BN= ${env.BUILD_NUMBER}
                 rm -rf /home/build/ofi-Install/libfabric'
-		mkdir -p /home/build/ofi-Install/libfabric/${env.BUILD_NUMBER}
+		mkdir -p /home/build/ofi-Install/libfabric/$BN
                 ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		./configure --prefix=/home/build/ofi-Install/libfabric/$BN --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
