@@ -25,7 +25,7 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-		sh ' echo ${env.CHANGE_ID}'
+		sh "echo ${env.CHANGE_ID}"
                 sh 'rm -rf /home/build/ofi-Install/libfabric'
 		sh 'mkdir -p "/home/build/ofi-Install/libfabric/${env.CHANGE_ID}"'
                 sh './autogen.sh'
