@@ -59,8 +59,12 @@ pipeline {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh """
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-shmem.sh
-		 ./contrib/Intel/JenkinsBuildScripts/build-shmem.sh
+		 PRNUM="${env.CHANGE_ID}"
+		 BuildNo="${env.BUILD_NUMBER}"
+		 echo $PRNUM
+		 echo $BuildNo
+		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-shmem.sh 
+		 ./contrib/Intel/JenkinsBuildScripts/build-shmem.sh $PRNUM $BuildNo
 		"""
 	      }
 	    }
