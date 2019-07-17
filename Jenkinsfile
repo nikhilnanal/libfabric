@@ -24,11 +24,11 @@ pipeline {
 		sh """
 		
 		#PRNUM="${env.CHANGE_ID}"
-		BuildNo="${env.BUILD_NUMBER}"
+		#BuildNo="${env.BUILD_NUMBER}"
                 rm -rf /home/build/ofi-Install/libfabric
-		mkdir -p /home/build/ofi-Install/libfabric/\$BuildNo
+		mkdir -p /home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
                 ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/\$BN --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		./configure --prefix=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
@@ -41,10 +41,10 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh """
                     echo "to-do tests here"    
-                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/
+                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}
             	    cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BUILD_NUMBER}
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
                     make clean
                     make && make install
                     cd /home/build/ofi-Install/libfabric-fabtests/
