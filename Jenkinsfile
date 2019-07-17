@@ -47,7 +47,7 @@ pipeline {
                     ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
                     make clean
                     make && make install
-                    cd /home/build/ofi-Install/libfabric-fabtests/
+                    cd /home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}/
                     ls -l
                     echo "Hello World 2"
                 """
