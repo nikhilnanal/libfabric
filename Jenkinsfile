@@ -29,9 +29,9 @@ pipeline {
 		echo ${env.BUILD_NUMBER}
 		BN="${env.BUILD_NUMBER}"
                 rm -rf /home/build/ofi-Install/libfabric
-		mkdir -p /home/build/ofi-Install/libfabric/$BN
+		mkdir -p /home/build/ofi-Install/libfabric/\$BN
                 ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/$BN --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		./configure --prefix=/home/build/ofi-Install/libfabric/\$BN --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
