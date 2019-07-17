@@ -28,7 +28,7 @@ pipeline {
 		sh """
 		echo ${env.BUILD_NUMBER}
 		BN="${env.BUILD_NUMBER}"
-                rm -rf /home/build/ofi-Install/libfabric'
+                rm -rf /home/build/ofi-Install/libfabric
 		mkdir -p /home/build/ofi-Install/libfabric/\$BN
                 ./autogen.sh
 		./configure --prefix=/home/build/ofi-Install/libfabric/\$BN --with-psm2-src="$WORKSPACE/opa-psm2-lib"
