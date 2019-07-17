@@ -65,6 +65,7 @@ pipeline {
 	      }
 	    }
 	}
+/*    
         stage ('build-benchmarks-with-ompi') {
 	    steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
@@ -99,7 +100,7 @@ pipeline {
 	      }
 	    }
 	}
-/*	
+	
 	stage('build Intel MPI + benchmarks') {
 	    steps {
 	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
