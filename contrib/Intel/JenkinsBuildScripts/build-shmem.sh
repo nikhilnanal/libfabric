@@ -12,7 +12,7 @@
 		make -j4
 		make check TESTS=
 		make install
-	)
+       )
 		   
       #build ISx
       (
@@ -31,5 +31,5 @@
       (
 	   cd /home/build/ofi-Install/libfabric/$PRNUM/$BuildNo/shmem
 	   git clone --depth 1 https://github.com/openshmem-org/tests-uh.git tests-uh && cd tests-uh
-	   PATH=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}/shmem/bin:$PATH make -j4 C_feature_tests
+	   PATH=/home/build/ofi-Install/libfabric/$PRNUM/$BuildNo/shmem/bin:$PATH make -j4 C_feature_tests
       )
