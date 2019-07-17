@@ -59,7 +59,8 @@ pipeline {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh '''
-		  ./contrib/Intel/JenkinsBuildScripts/build-shmem.sh
+		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-shmem.sh
+		 ./contrib/Intel/JenkinsBuildScripts/build-shmem.sh
 		'''
 	      }
 	    }
