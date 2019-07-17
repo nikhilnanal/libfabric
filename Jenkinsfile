@@ -26,7 +26,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
 		sh '''
-		"echo ${env.CHANGE_ID}"
+		echo "${env.CHANGE_ID}"
 		 PRNUM="${env.CHANGE_ID}"
                 rm -rf /home/build/ofi-Install/libfabric'
 		mkdir -p \"/home/build/ofi-Install/libfabric/$PRNUM
