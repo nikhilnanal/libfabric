@@ -25,14 +25,17 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-		sh "echo ${env.CHANGE_ID}"
-                sh 'rm -rf /home/build/ofi-Install/libfabric'
-		sh "mkdir -p \"/home/build/ofi-Install/libfabric/${env.CHANGE_ID}""
-                sh './autogen.sh'
-		sh "./configure --prefix=\"/home/build/ofi-Install/libfabric/${env.CHANGE_ID}" --with-psm2-src="$WORKSPACE/opa-psm2-lib""
-                sh  'make clean' 
-                sh 'make && make install'
-                sh 'echo "Hello World" '
+		sh '''
+		"echo ${env.CHANGE_ID}"
+		 PRNUM="${env.CHANGE_ID}"
+                rm -rf /home/build/ofi-Install/libfabric'
+		mkdir -p \"/home/build/ofi-Install/libfabric/$PRNUM
+                ./autogen.sh
+		./configure --prefix="/home/build/ofi-Install/libfabric/$PRNUM" --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+                make clean 
+                make && make install
+                echo "Hello World"
+	        '''
                 }
             }
         }
@@ -42,10 +45,10 @@ pipeline {
                 sh '''
                     echo "to-do tests here"    
                     rm -rf  /home/build/ofi-Install/libfabric-fabtests/
-            	    
+            	    PRNUM="${env.CHANGE_ID}"
                     cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    "./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric/${env.CHANGE_ID}""
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric="/home/build/ofi-Install/libfabric/$PRNUM"
                     make clean
                     make && make install
                     cd /home/build/ofi-Install/libfabric-fabtests/
