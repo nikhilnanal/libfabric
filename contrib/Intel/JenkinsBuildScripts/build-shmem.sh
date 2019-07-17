@@ -2,12 +2,12 @@
 
 	    ( 
        #build shmem
-       rm -rf /home/build/ofi-Install/libfabric/${env.BUILD_NUMBER}/shmem
-       mkdir /home/build/ofi-Install/libfabric/${env.BUILD_NUMBER}/shmem
-       cd  /home/build/ofi-Install/libfabric/${env.BUILD_NUMBER}/shmem
+       rm -rf /home/build/ofi-Install/libfabric/"${env.CHANGE_ID}"/"${env.BUILD_NUMBER}"/shmem
+       mkdir /home/build/ofi-Install/libfabric/"${env.CHANGE_ID}"/"${env.BUILD_NUMBER}"/shmem
+       cd  /home/build/ofi-Install/libfabric/"${env.CHANGE_ID}"/"${env.BUILD_NUMBER}"/shmem
        mkdir SOS && tar -xf /home/build/v1.4.2.tar.gz -C SOS --strip-components 1 && cd SOS
        ./autogen.sh
-		   ./configure --prefix=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}/shmem --disable-fortran --enable-remote-virtual-addressing --disable-aslr-check --enable-pmi-simple --with-ofi=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER} LDFLAGS="-fno-pie"
+		   ./configure --prefix=/home/build/ofi-Install/libfabric/"${env.CHANGE_ID}"/"${env.BUILD_NUMBER}"/shmem --disable-fortran --enable-remote-virtual-addressing --disable-aslr-check --enable-pmi-simple --with-ofi=/home/build/ofi-Install/libfabric/"${env.CHANGE_ID}"/"${env.BUILD_NUMBER}" LDFLAGS="-fno-pie"
 		   make -j4
 		   make check TESTS=
 		   make install
