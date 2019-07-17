@@ -58,10 +58,10 @@ pipeline {
         stage ('build-shmem') {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-                sh '''
+                sh """
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-shmem.sh
 		 ./contrib/Intel/JenkinsBuildScripts/build-shmem.sh
-		'''
+		"""
 	      }
 	    }
 	}
