@@ -26,8 +26,8 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
 		sh """
-		echo ${env.BUILD_NUMBER}
-		BN="${env.BUILD_NUMBER}"
+		echo ${env.CHANGE_ID}
+		BN="${env.CHANGE_ID}"
                 rm -rf /home/build/ofi-Install/libfabric
 		mkdir -p /home/build/ofi-Install/libfabric/\$BN
                 ./autogen.sh
@@ -47,7 +47,7 @@ pipeline {
                     rm -rf  /home/build/ofi-Install/libfabric-fabtests/
             	    cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BUILD_NUMBER}
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests" --with-libfabric=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}
                     make clean
                     make && make install
                     cd /home/build/ofi-Install/libfabric-fabtests/
