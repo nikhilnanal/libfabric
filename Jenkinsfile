@@ -68,38 +68,18 @@ pipeline {
 	      }
 	    }
 	}
-/*    
+  
         stage ('build-benchmarks-with-ompi') {
 	    steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-	       sh '''
-		      
-	           #build ompi
-	           (
-		   cd $WORKSPACE
-		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/
-		   /home/build/scm/ompi_4.0.1/configure --disable-oshmem --enable-mpi-fortran=no --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi --with-libfabric=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/
-		   make install -j32
-		   )
-		   
-		   #build mpi stress test with ompi
-		   (
-		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress && LD_LIBRARY_PATH=""
-		   /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/stress/mpi_stress
-		   )
-		   
-		    #build osu benchmarks with ompi
-		   (
-		   mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu
-		   export CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicc
-		   export CXX=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/bin/mpicxx
-		   export CFLAGS="-I/home/build/scm/osu-micro-benchmarks-5.5/util/"
-		   export LD_LIBRARY_PATH=""
-		   /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/ompi/osu
-		   make -j4
-		   make install
-		    )
-		 '''
+	       sh """
+		 PRNUM="${env.CHANGE_ID}"
+		 BuildNo="${env.BUILD_NUMBER}"
+		 
+		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-OpenMPI.sh 
+		 ./contrib/Intel/JenkinsBuildScripts/build-OpenMPI.sh \$PRNUM \$BuildNo  
+	        
+		 """
 	      }
 	    }
 	}
