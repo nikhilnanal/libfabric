@@ -75,9 +75,8 @@ pipeline {
 	       sh """
 		 PRNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
-		 
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-OpenMPI.sh 
-		 ./contrib/Intel/JenkinsBuildScripts/build-OpenMPI.sh \$PRNUM \$BuildNo  
+		 chmod 777 contrib/Intel/JenkinsBuildScripts/build-OpenMPI.sh 
+		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$PRNUM \$BuildNo  
 	        
 		 """
 	      }
