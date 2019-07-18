@@ -83,7 +83,8 @@ pipeline {
 	      }
 	    }
 	}
-	
+
+/*	
 	stage('build Intel MPI + benchmarks') {
 	    steps {
 	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
