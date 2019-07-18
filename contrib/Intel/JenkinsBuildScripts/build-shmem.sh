@@ -2,8 +2,9 @@
 
 	PRNUM=$1
 	BuildNo=$2
-      ( 
-        #build shmem
+     
+     	#build shmem
+	( 
         rm -rf /home/build/ofi-Install/libfabric/$PRNUM/$BuildNo/shmem
         mkdir /home/build/ofi-Install/libfabric/$PRNUM/$BuildNo/shmem
         cd  /home/build/ofi-Install/libfabric/$PRNUM/$BuildNo/shmem
