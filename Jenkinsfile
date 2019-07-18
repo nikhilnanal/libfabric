@@ -92,9 +92,6 @@ pipeline {
 		  BuildNo="${env.BUILD_NUMBER}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
 		  ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh  \$PRNUM \$BuildNo  
-		  echo "run completed"
-	
-			
 		"""
 	      }
 	    }
