@@ -86,8 +86,7 @@ pipeline {
 	stage('build Intel MPI + benchmarks') {
 	    steps {
 	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-		sh """
-		  echo "run IntelMPI stage"				    
+		sh """				    
 		  PRNUM="${env.CHANGE_ID}"
 		  BuildNo="${env.BUILD_NUMBER}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
