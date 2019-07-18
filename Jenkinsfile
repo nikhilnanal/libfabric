@@ -62,8 +62,8 @@ pipeline {
 		 PRNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
 		 
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/build-shmem.sh 
-		 ./contrib/Intel/JenkinsBuildScripts/build-shmem.sh \$PRNUM \$BuildNo
+		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
+		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$PRNUM \$BuildNo
 		"""
 	      }
 	    }
