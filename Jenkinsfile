@@ -61,7 +61,6 @@ pipeline {
                 sh """
 		 PRNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
-		 
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
 		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$PRNUM \$BuildNo
 		"""
@@ -77,7 +76,6 @@ pipeline {
 		 BuildNo="${env.BUILD_NUMBER}"
 		 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
 		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$PRNUM \$BuildNo  
-	        
 		 """
 	      }
 	    }
