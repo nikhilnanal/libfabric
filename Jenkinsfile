@@ -25,7 +25,7 @@ pipeline {
 		
 		#PRNUM="${env.CHANGE_ID}"
 		#BuildNo="${env.BUILD_NUMBER}"
-                rm -rf /home/build/ofi-Install/libfabric
+                rm -rf /home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
 		mkdir -p /home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
                 ./autogen.sh
 		./configure --prefix=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
