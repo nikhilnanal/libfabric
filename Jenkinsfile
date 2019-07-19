@@ -24,11 +24,12 @@ pipeline {
 		sh """
 		
 		#PRNUM="${env.CHANGE_ID}"
-		#BuildNo="${env.BUILD_NUMBER}"
-                rm -rf /home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-		mkdir -p /home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
+		#BuildNo="${env.BUILD_NUMBER}
+		BranchName="${env.BRANCH_NAME}"
+                rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
+		mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
                 ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
@@ -41,13 +42,13 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh """
                     echo "to-do tests here"    
-                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}
+                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
             	    cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.CHANGE_ID}/${env.BUILD_NUMBER}
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
                     make clean
                     make && make install
-                    cd /home/build/ofi-Install/libfabric-fabtests/${env.CHANGE_ID}/${env.BUILD_NUMBER}/
+                    cd /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}/
                     ls -l
                     echo "Hello World 2"
                 """
@@ -59,10 +60,11 @@ pipeline {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh """
-		 PRNUM="${env.CHANGE_ID}"
+		 PrNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
+		 BranchName ="${env.BRANCH_NAME}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
-		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$PRNUM \$BuildNo
+		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$PrNUM \$BuildNo
 		"""
 	      }
 	    }
@@ -72,10 +74,11 @@ pipeline {
 	    steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
 	       sh """
-		 PRNUM="${env.CHANGE_ID}"
+		 PrNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
+		 BranchName ="${env.BRANCH_NAME}"
 		 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
-		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$PRNUM \$BuildNo  
+		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
 		 echo "run completed"
 		 """
 	      }
@@ -86,14 +89,13 @@ pipeline {
 	stage('build Intel MPI + benchmarks') {
 	    steps {
 	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-		sh """				    
-		  PRNUM="${env.CHANGE_ID}"
+		sh """
+		  echo "run IntelMPI stage"				    
+		  PrNUM="${env.CHANGE_ID}"
 		  BuildNo="${env.BUILD_NUMBER}"
+		  BranchName ="${env.BRANCH_NAME}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
-		  ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh  \$PRNUM \$BuildNo  
-		  echo "run completed"
-	
-			
+		  ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
 		"""
 	      }
 	    }
