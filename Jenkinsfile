@@ -62,7 +62,7 @@ pipeline {
                 sh """
 		 PrNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
-		 BranchName ="${env.BRANCH_NAME}"
+		 BranchName="${env.BRANCH_NAME}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
 		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$PrNUM \$BuildNo
 		"""
@@ -93,7 +93,7 @@ pipeline {
 		  echo "run IntelMPI stage"				    
 		  PrNUM="${env.CHANGE_ID}"
 		  BuildNo="${env.BUILD_NUMBER}"
-		  BranchName ="${env.BRANCH_NAME}"
+		  BranchName="${env.BRANCH_NAME}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
 		  ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
 		"""
