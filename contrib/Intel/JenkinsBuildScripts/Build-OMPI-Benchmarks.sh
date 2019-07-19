@@ -28,4 +28,4 @@
 		   make -j4
 		   make install
 		    )
-© 2019 GitHub, Inc.
+
