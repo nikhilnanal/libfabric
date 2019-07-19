@@ -76,7 +76,7 @@ pipeline {
 	       sh """
 		 PrNUM="${env.CHANGE_ID}"
 		 BuildNo="${env.BUILD_NUMBER}"
-		 BranchName ="${env.BRANCH_NAME}"
+		 BranchName="${env.BRANCH_NAME}"
 		 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
 		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
 		 echo "run completed"
