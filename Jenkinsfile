@@ -21,16 +21,16 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-		sh """
-		
+                sh """
+                #build opa-psm2
                 rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
-		mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+	             	mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                 ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		            ./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
-	        """
+	              """
                 }
             }
         }
@@ -40,61 +40,57 @@ pipeline {
                 sh """
                     echo "to-do tests here"    
                     rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
-            	    cd $WORKSPACE/fabtests
+            	      cd $WORKSPACE/fabtests
                     ./autogen.sh
                     ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                     make clean
                     make && make install
-                    cd /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/
-                    ls -l
-                    echo "Hello World 2"
                 """
                 }
-                }
             }
+        }
 	    
         stage ('build-shmem') {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh """
-		 
-		 BranchName="${env.BRANCH_NAME}"
-		 BuildNo="${env.BUILD_NUMBER}"
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
-		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$BuildNo
-		"""
+                 BranchName="${env.BRANCH_NAME}"
+                 BuildNo="${env.BUILD_NUMBER}"
+                  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
+                 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$BuildNo
+                """
+	            }
+	          }
 	      }
-	    }
-	}
   
         stage ('build-benchmarks-with-ompi') {
-	    steps {
+	          steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-	       sh """
-		 BranchName="${env.BRANCH_NAME}"
-		 BuildNo="${env.BUILD_NUMBER}"
-		 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
-		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$BuildNo  
-		 echo "run completed"
-		 """
+	              sh """
+                 BranchName="${env.BRANCH_NAME}"
+                 BuildNo="${env.BUILD_NUMBER}"
+                 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
+                 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$BuildNo  
+                 echo "run completed"
+                 """
+	            }
+	          }
 	      }
-	    }
-	}
 	
-	stage('build Intel MPI + benchmarks') {
-	    steps {
-	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-		sh """
-		  echo "run IntelMPI stage"				    
-                  
-		  BranchName="${env.BRANCH_NAME}"
-		  BuildNo="${env.BUILD_NUMBER}"
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
-		  ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh \$BranchName \$BuildNo  
-		"""
+    stage('build Intel MPI + benchmarks') {
+        steps {
+          withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                sh """
+                echo "run IntelMPI stage"				                 
+                BranchName="${env.BRANCH_NAME}"
+                BuildNo="${env.BUILD_NUMBER}"
+                chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
+
+                ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh \$BranchName \$BuildNo  
+              """
+	        }
 	      }
-	    }
-	}  
+	  }  
 	
 	stage('build MPICH + Benchmarks') {
 	    steps {
