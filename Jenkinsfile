@@ -21,19 +21,16 @@ pipeline {
         stage ('build') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
-		sh """
-		
-		#PRNUM="${env.CHANGE_ID}"
-		#BuildNo="${env.BUILD_NUMBER}
-		BranchName="${env.BRANCH_NAME}"
-                rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-		mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
+                sh """
+                #build opa-psm2
+                rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+	             	mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                 ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		            ./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
-	        """
+	              """
                 }
             }
         }
@@ -42,100 +39,73 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh """
                     echo "to-do tests here"    
-                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-            	    cd $WORKSPACE/fabtests
+                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+            	      cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
+                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                     make clean
                     make && make install
-                    cd /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}/
-                    ls -l
-                    echo "Hello World 2"
                 """
                 }
-                }
             }
+        }
 	    
         stage ('build-shmem') {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh """
-		 PrNUM="${env.CHANGE_ID}"
-		 BuildNo="${env.BUILD_NUMBER}"
-		 BranchName="${env.BRANCH_NAME}"
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
-		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$PrNUM \$BuildNo
-		"""
+                 BranchName="${env.BRANCH_NAME}"
+                 BuildNo="${env.BUILD_NUMBER}"
+                  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
+                 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$BuildNo
+                """
+	            }
+	          }
 	      }
-	    }
-	}
   
         stage ('build-benchmarks-with-ompi') {
-	    steps {
+	          steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-	       sh """
-		 PrNUM="${env.CHANGE_ID}"
-		 BuildNo="${env.BUILD_NUMBER}"
-		 BranchName="${env.BRANCH_NAME}"
-		 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
-		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
-		 echo "run completed"
-		 """
+	              sh """
+                 BranchName="${env.BRANCH_NAME}"
+                 BuildNo="${env.BUILD_NUMBER}"
+                 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
+                 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$BuildNo  
+                 echo "run completed"
+                 """
+	            }
+	          }
 	      }
-	    }
-	}
-
 	
-	stage('build Intel MPI + benchmarks') {
-	    steps {
-	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-		sh """
-		  echo "run IntelMPI stage"				    
-		  PrNUM="${env.CHANGE_ID}"
-		  BuildNo="${env.BUILD_NUMBER}"
-		  BranchName="${env.BRANCH_NAME}"
-		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
-		  ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
-		"""
+    stage('build Intel MPI + benchmarks') {
+        steps {
+          withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                sh """
+                echo "run IntelMPI stage"				                 
+                BranchName="${env.BRANCH_NAME}"
+                BuildNo="${env.BUILD_NUMBER}"
+                chmod 777 contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh 
+
+                ./contrib/Intel/JenkinsBuildScripts/Build-IntelMPI-Benchmarks.sh \$BranchName \$BuildNo  
+              """
+	        }
 	      }
-	    }
-	}  
-/*	
+	  }  
+	
 	stage('build MPICH + Benchmarks') {
 	    steps {
 	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
-                sh '''
-		    #build mpich
-		    (
-		    cd $WORKSPACE
-		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich
-		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich_build/  && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich_build/
-		    /home/build/scm/mpich/configure --disable-oshmem --enable-fortran=no --prefix="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/" --with-libfabric="/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/"
-		    make clean
-		    make install -j32
-		    )
-
-		    #build mpi stress test with mpich
-		    (
-		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress 
-		    /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress/mpi_stress
-		    )
-		    #build osu benchmarks with mpich
-		    (
-		    mkdir -p /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/osu && cd /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/osu
-		    export CC=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicc
-		    export CXX=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicxx
-		    export CFLAGS="-I/home/build/scm/osu-micro-benchmarks-5.5/util/"
-		    export LD_LIBRARY_PATH=""
-		    /home/build/scm/osu-micro-benchmarks-5.5/configure --prefix=/home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/osu
-		    make -j4
-		    make install
-		    )
-                '''
+                sh """
+		  echo "run Mpich stage"				    
+		  BranchName="${env.BRANCH_NAME}"
+		  BuildNo="${env.BUILD_NUMBER}"
+		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-MPICH-Benchmarks.sh 
+		  ./contrib/Intel/JenkinsBuildScripts/Build-MPICH-Benchmarks.sh \$BranchName \$BuildNo  
+                """
               }
             }
         }
-                    
+ /*                   
         stage ('execute-hfi-psm2-tests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
