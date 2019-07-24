@@ -4,7 +4,7 @@ pipeline {
         pollSCM('H/2 * * * *')
     }
     environment {
-    	ofi-install-path="/home/build/ofi-Install/libfabric"
+    	ofi_install_path="/home/build/ofi-Install/libfabric"
     } 
     stages {
         stage ('fetch-opa-psm2')  {
@@ -26,7 +26,7 @@ pipeline {
                 sh """
                 #build opa-psm2
 		#ofi-install-path = /home/build/ofi-Install/libfabric
-                rm -rf ${env.ofi-install-path}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+                rm -rf ${env.ofi_install_path}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
 	        mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                 ./autogen.sh
 		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
