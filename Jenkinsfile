@@ -26,20 +26,11 @@ stages {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
 		sh """
 		
-<<<<<<< HEAD
+
                 rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
 		mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                 ./autogen.sh
 		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
-=======
-		#PRNUM="${env.CHANGE_ID}"
-		#BuildNo="${env.BUILD_NUMBER}
-		BranchName="${env.BRANCH_NAME}"
-                rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-		mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-                ./autogen.sh
-		./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
->>>>>>> 797c7e3... Update Jenkinsfile
                 make clean 
                 make && make install
                 echo "Hello World"
@@ -53,7 +44,6 @@ stages {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh """
                     echo "to-do tests here"    
-<<<<<<< HEAD
                     rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
             	    cd $WORKSPACE/fabtests
                     ./autogen.sh
@@ -61,15 +51,6 @@ stages {
                     make clean
                     make && make install
                     cd /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/
-=======
-                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-            	    cd $WORKSPACE/fabtests
-                    ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}
-                    make clean
-                    make && make install
-                    cd /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.CHANGE_ID}/${env.BUILD_NUMBER}/
->>>>>>> 797c7e3... Update Jenkinsfile
                     ls -l
                     echo "Hello World 2"
                 """
@@ -81,20 +62,11 @@ stages {
             steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
                 sh """
-<<<<<<< HEAD
-		 
-		 BranchName="${env.BRANCH_NAME}"
-=======
-		 PrNUM="${env.CHANGE_ID}"
->>>>>>> 797c7e3... Update Jenkinsfile
 		 BuildNo="${env.BUILD_NUMBER}"
 		 BranchName="${env.BRANCH_NAME}"
 		  chmod 777 contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh
-<<<<<<< HEAD
+
 		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$BuildNo
-=======
-		 ./contrib/Intel/JenkinsBuildScripts/Build-SHMEM.sh \$BranchName \$PrNUM \$BuildNo
->>>>>>> 797c7e3... Update Jenkinsfile
 		"""
 	      }
 	    }
@@ -104,19 +76,10 @@ stages {
 	    steps {
               withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
 	       sh """
-<<<<<<< HEAD
-		 BranchName="${env.BRANCH_NAME}"
-=======
-		 PrNUM="${env.CHANGE_ID}"
->>>>>>> 797c7e3... Update Jenkinsfile
 		 BuildNo="${env.BUILD_NUMBER}"
 		 BranchName="${env.BRANCH_NAME}"
 		 chmod 777 contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh 
-<<<<<<< HEAD
 		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$BuildNo  
-=======
-		 ./contrib/Intel/JenkinsBuildScripts/Build-OMPI-Benchmarks.sh \$BranchName \$PrNUM \$BuildNo  
->>>>>>> 797c7e3... Update Jenkinsfile
 		 echo "run completed"
 		 """
 	      }
@@ -128,7 +91,6 @@ stages {
 	      withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
 		sh """
 		  echo "run IntelMPI stage"				    
-		  BranchName="${env.BRANCH_NAME}"
 
 		  BuildNo="${env.BUILD_NUMBER}"
 		  BranchName="${env.BRANCH_NAME}"
