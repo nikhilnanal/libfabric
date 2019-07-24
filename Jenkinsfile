@@ -3,7 +3,11 @@ pipeline {
     triggers {
         pollSCM('H/2 * * * *')
     }
-   
+    environment {
+	// variables are referenced as ${env.VarName} in shell script.
+    	ofi_install_dir="/home/build/ofi-Install/libfabric"
+	fabtests_install_dir="/home/build/ofi-Install/libfabric-fabtests"
+    } 
     stages {
         stage ('fetch-opa-psm2')  {
              steps {
@@ -23,10 +27,11 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh """
                 #build opa-psm2
-                rm -rf /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
-	             	mkdir -p /home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+		#ofi-install-path = /home/build/ofi-Install/libfabric
+                rm -rf ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+	        mkdir -p ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                 ./autogen.sh
-		            ./configure --prefix=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
+		./configure --prefix=${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER} --with-psm2-src="$WORKSPACE/opa-psm2-lib"
                 make clean 
                 make && make install
                 echo "Hello World"
@@ -39,10 +44,10 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) { 
                 sh """
                     echo "to-do tests here"    
-                    rm -rf  /home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+                    rm -rf  ${env.fabtests_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
             	      cd $WORKSPACE/fabtests
                     ./autogen.sh
-                    ./configure --prefix="/home/build/ofi-Install/libfabric-fabtests/${env.BRANCH_NAME}/${env.BUILD_NUMBER}" --with-libfabric=/home/build/ofi-Install/libfabric/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
+                    ./configure --prefix="${env.fabtests_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}" --with-libfabric=${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}
                     make clean
                     make && make install
                 """
