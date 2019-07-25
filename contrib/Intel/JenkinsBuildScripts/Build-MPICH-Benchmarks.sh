@@ -12,8 +12,8 @@
 
 		    #build mpi stress test with mpich
 		    (
-		    mkdir -p /home/build/ofi-Install/libfabric/$BranchName/$BuildNo/mpich/stress && cd /home/build/ofi-Install/libfabric/$BranchName/$BuildNo/mpich/stress 
-		    /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/jenkinsbuild/workspace/libfabrics-pipbuild/mpich/stress/mpi_stress
+		    mkdir -p /home/build/ofi-Install/libfabric/$BranchName/$BuildNo/mpich/stress && cd /home/build/ofi-Install/libfabric/$BranchName/$BuildNo/mpich/stress && LD_LIBRARY_PATH=""
+		    /home/build/ofi-Install/libfabric/$BranchName/$BuildNo/mpich/bin/mpicc -lz /home/build/scm/wfr-mpi-tests/mpi_stress/mpi_stress.c -o /home/build/ofi-Install/libfabric/$BranchName/$BuildNo/mpich/stress/mpi_stress
 		    )
 		    #build osu benchmarks with mpich
 		    (
