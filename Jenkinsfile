@@ -110,11 +110,22 @@ pipeline {
               }
             }
         }
- /*                   
+                    
         stage ('execute-hfi-psm2-tests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
-                  /*sh ''' 
+                 
+		 sh """
+		  BranchName="${env.BRANCH_NAME}"
+		  BuildNo="${env.BUILD_NUMBER}"
+		  cd contrib/Intel/JenkinsBuildScripts/
+		  chmod 777 runtests.py
+		  python runtests.py \$BranchName \$BuildNo "psm2"	
+		"""
+		}
+	    }
+	}
+		/*sh ''' 
                         echo "execute-tests"
                         cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/
                         pwd
