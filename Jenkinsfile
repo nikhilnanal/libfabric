@@ -110,7 +110,62 @@ pipeline {
               }
             }
         }
-                    
+   stage('parallel-fi_getinfo-stage') {
+            parallel {
+                stage('eth-test') {
+                     agent {
+                        label 'eth'
+                     }
+                     steps{
+                        withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                          sh """
+		                     echo "run fi_info stage"				    
+		                     echo ${env.NODE_NAME}
+                             echo ${env.FABRIC}
+		                     cd ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/
+		                     ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC}
+                          """
+                        } 
+                     }       
+       
+                 }
+                 stage('hfi1-test') {
+                     agent {
+                        label 'hfi1'
+                     }
+                     steps{
+                        withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                          sh """
+		                     echo "run fi_info stage"				    
+		                     echo ${env.NODE_NAME}
+                             echo ${env.FABRIC}
+		                     cd ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/
+		                     ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC}
+                          """
+                        } 
+                     }       
+       
+                 }
+                 stage('eth-test') {
+                     agent {
+                        label 'eth'
+                     }
+                     steps{
+                        withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']) {
+                          sh """
+		                     echo "run fi_info stage"				    
+		                     echo ${env.NODE_NAME}
+                             echo ${env.FABRIC}
+		                     cd ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/
+		                     ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC} 
+                          """
+                        } 
+                     }       
+       
+                 }    
+            } 
+   }        
+        /*
         stage ('execute-hfi-psm2-tests') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin']){
@@ -125,6 +180,9 @@ pipeline {
 		}
 	    }
 	}
+
+        */
+
 		/*sh ''' 
                         echo "execute-tests"
                         cd /home/build/jenkinsbuild/workspace/libfabric-fabtests/bin/
