@@ -90,51 +90,25 @@ pipeline {
    stage('parallel-fi_getinfo-stage') {
             parallel {
                 stage('eth-test') {
-                     agent {
-                        node {
-                            label 'FABRIC_1'
-                        }
-                     }
+                     agent {node {label 'FABRIC_1'}}
                      steps{
                         withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/:$PYTHONPATH'])
                         {
                           sh """
                             env
-            ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC}
-            cd  ${env.WORKSPACE}/contrib/intel/jenkins/
-            python3.7 run.py tcp n1 fabtests
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 fabtests
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 fabtests --util=rxd
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py sockets n1 fabtests
-
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py tcp n1 IMB
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 IMB
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 IMB --util=rxd
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py sockets n1 IMB
-
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py tcp n1 stress
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 stress
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 stress --util=rxd
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py sockets n1 stress
-
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py tcp n1 osu_test
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 osu_test
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py udp n1 osu_test --util=rxd
-            python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py sockets n1 osu_test
-                        
-            cd ${env.WORKSPACE}  
+                            ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC}
+                            cd  ${env.WORKSPACE}/contrib/intel/jenkins/
+                            python3.7 runtests.py n1 tcp
+                            python3.7 runtests.py n1 udp 
+                            python3.7 runtests.py n1 sockets               
+                            cd ${env.WORKSPACE}  
                         """
                         } 
                      }       
        
                  }
                  stage('hfi1-test') {
-                     agent {
-                        node {
-                            label 'FABRIC_2'
-
-                        }
-                     }
+                     agent {node {label 'FABRIC_2'}}
                      steps{
                         withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin:$PYTHONPATH']) {
                           sh """
@@ -146,28 +120,10 @@ pipeline {
                          
                             
                             ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC}
-                            
-                            
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py psm2 n5 fabtests
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 fabtests 
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 fabtests --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 fabtests --util=rxm
-
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py psm2 n5 IMB
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 IMB 
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 IMB --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 IMB --util=rxm
-
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py psm2 n5 stress
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 stress
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 stress --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 stress --util=rxm
-
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py psm2 n5 osu_test
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 osu_test
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 osu_test --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n5 osu_test --util=rxm
-
+                            cd ${env.WORKSPACE}/contrib/intel/jenkins/
+                            python3.7 runtests.py n5 psm2
+                            python3.7 runtests.py n5 verbs                   
+                            cd ${env.WORKSPACE} 
 
                          """
                         } 
@@ -175,12 +131,7 @@ pipeline {
        
                  }
                  stage('mlx-test') {
-                     agent {
-                        node {
-                            label 'FABRIC_3'
-                           
-                        }
-                     }
+                     agent {node {label 'FABRIC_3'}}
                      steps{
                         withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin:$PYTHONPATH']) {
                           sh """
@@ -191,26 +142,12 @@ pipeline {
                             echo ${env.CI_SITE_CONFIG}
                            
                             
-                            ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC} 
-                            
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 fabtests
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 fabtests --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 fabtests --util=rxm
-       
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 IMB
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 IMB --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 IMB --util=rxm
-       
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 stress
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 stress --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 stress --util=rxm
-        
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 osu_test
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 osu_test --util=rxd
-        python3.7 ${env.WORKSPACE}/contrib/intel/jenkins/run.py verbs n65 osu_test --util=rxm
-          
- 
-                         """
+                            ${env.ofi_install_dir}/${env.BRANCH_NAME}/${env.BUILD_NUMBER}/bin/fi_info -f ${env.FABRIC}
+                            cd ${env.WORKSPACE}/contrib/intel/jenkins/
+                            python3.7 runtests.py n65 verbs                   
+                            cd ${env.WORKSPACE}  
+
+                            """
                         } 
                      }       
        

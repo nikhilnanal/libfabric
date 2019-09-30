@@ -20,7 +20,9 @@ parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
 
 group.add_argument("--builditem", help="build libfabric or fabtests",
-                     choices=['libfabric','libfabirc-dbg','libfabric-dl', 'fabtests'])
+                     choices=['libfabric', 'fabtests'])
+group.add_argument("--buildmode", help=" select between debug,dl and regular builds",
+                    choices=['debug','dl'])
 group.add_argument("--mpi", help="select mpi type for building mpi benchmarks",
                     choices=['impi', 'ompi', 'mpich'])
 group.add_argument("--other_benchmarks", help="build other non mpi benchmarks",
@@ -29,6 +31,7 @@ group.add_argument("--other_benchmarks", help="build other non mpi benchmarks",
 args = parser.parse_args()
 
 builditem = args.builditem
+mode = args.buildmode
 mpi = args.mpi
 other_bm = args.other_benchmarks
 
@@ -48,24 +51,59 @@ def runcommand(command):
         print("exiting with " + str(p.poll()))
         sys.exit(p.returncode)
 
-def build_libfabric():
-    if (os.path.exists(install_path) != True):
-        os.makedirs(install_path)  
-    runcommand(['./autogen.sh'])
-    runcommand(shlex.split(" ".join(['./configure','--prefix={}'.format(install_path),
-                            '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=yes',
-                            '--enable-verbs', '--enable-rxd=yes', '--enable-rxm=yes', 
-                            '--enable-sockets=yes', '--enable-tcp=yes', '--enable-udp=yes',
-                            '--enable-shm=yes','--with-psm2-src={}/opa-psm2-lib'.format(workspace)])))
-    runcommand(['make','clean'])
-    runcommand(['make'])
-    runcommand(['make','install'])
+def build_libfabric(mode=None):
 
-def build_fabtests():
+        if (mode == 'debug'):
+            libfab_installpath = "{}/debug".format(install_path) 
+            config_cmd = ['./configure','--prefix={}'.format(libfab_installpath), '--enable-debug',
+                          '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=yes',
+                          '--enable-verbs=yes', '--enable-rxd=yes', '--enable-rxm=yes', 
+                          '--enable-sockets=yes', '--enable-tcp=yes', '--enable-udp=yes',
+                          '--enable-rxd=yes', '--enable-shm=yes', '--with-psm2-src={}/opa-psm2-lib'.format(workspace)]   
+
+        elif(mode == 'dl'):
+            libfab_installpath = "{}/dl".format(install_path)
+            config_cmd = ['./configure','--prefix={}'.format(libfab_installpath),
+                          '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=dl',
+                          '--enable-verbs=dl', '--enable-rxd=dl', '--enable-rxm=dl', 
+                          '--enable-sockets=dl', '--enable-tcp=dl', '--enable-udp=dl',
+                          '--enable-rxd=dl', '--enable-shm=dl', '--with-psm2-src={}/opa-psm2-lib'.format(workspace)]
+        else:
+            libfab_installpath = install_path
+            config_cmd = ['./configure','--prefix={}'.format(libfab_installpath),
+                          '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=yes',
+                          '--enable-verbs', '--enable-rxd=yes', '--enable-rxm=yes', 
+                          '--enable-sockets=yes', '--enable-tcp=yes', '--enable-udp=yes',
+                          '--enable-rxd=yes', '--enable-shm=yes', '--with-psm2-src={}/opa-psm2-lib'.format(workspace)]
+
+  
+        if (os.path.exists(install_path) != True):
+            os.makedirs(install_path)  
+    
+        runcommand(['./autogen.sh'])
+        runcommand(shlex.split(" ".join(config_cmd)))
+        runcommand(['make','clean'])
+        runcommand(['make'])
+        runcommand(['make','install'])
+
+def build_fabtests(mode=None):
+  
+     
+    fabtest_installpath =  install_path
     os.chdir('{}/fabtests'.format(workspace))
     runcommand(['./autogen.sh'])
-    runcommand(['./configure','--prefix={}'.format(install_path),
-                '--with-libfabric={}'.format(install_path)])
+    config_cmd = ['./configure', '--prefix={}'.format(fabtest_installpath),
+                '--with-libfabric={}'.format(fabtest_installpath)]
+    if (mode == 'debug'):   
+        fabtest_installpath = "{}/{}".format(install_path,mode)
+        config_cmd = ['./configure', '--enable-debug', '--prefix={}'.format(fabtest_installpath),
+                '--with-libfabric={}'.format(fabtest_installpath)]
+    elif (mode == 'dl'):
+         fabtest_installpath = "{}/{}".format(install_path,mode)
+         config_cmd = ['./configure', '--prefix={}'.format(fabtest_installpath),
+                '--with-libfabric={}'.format(fabtest_installpath)]                   
+
+    runcommand(config_cmd)
     runcommand(['make','clean'])
     runcommand(['make'])
     runcommand(['make', 'install'])
@@ -144,9 +182,9 @@ def build_osu_bm(mpi, mpi_install_path):
 
 if (builditem):
     if (builditem == 'libfabric'):
-        build_libfabric()
+        build_libfabric(mode)
     elif (builditem == 'fabtests'):
-        build_fabtests()
+        build_fabtests(mode)
 
 if (mpi):
 
