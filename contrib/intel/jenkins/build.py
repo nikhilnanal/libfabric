@@ -11,29 +11,26 @@ import shlex
 branchname = os.environ['BRANCH_NAME']
 buildno = os.environ['BUILD_NUMBER']
 workspace = os.environ['WORKSPACE']
-install_path = "{installdir}/{brname}/{bno}" \
-                .format(installdir=ci_site_config.install_dir,
-                        brname=branchname, bno=buildno)
 
 
 parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group(required=True)
+#group = parser.add_mutually_exclusive_group(required=True)
 
-group.add_argument("--builditem", help="build libfabric or fabtests",
-                     choices=['libfabric', 'fabtests'])
-group.add_argument("--buildmode", help=" select between debug,dl and regular builds",
-                    choices=['debug','dl'])
-group.add_argument("--mpi", help="select mpi type for building mpi benchmarks",
+parser.add_argument("--builditem", help="build libfabric or fabtests",
+                     choices=['libfabric','fabtests'])
+parser.add_argument("--mpi", help="select mpi type for building mpi benchmarks",
                     choices=['impi', 'ompi', 'mpich'])
-group.add_argument("--other_benchmarks", help="build other non mpi benchmarks",
+parser.add_argument("--build_mode", help="select buildmode debug or dl", choices=['dbg','dl'])
+parser.add_argument("--other_benchmarks", help="build other non mpi benchmarks",
                            choices=['shmem'])
 
 args = parser.parse_args()
 
 builditem = args.builditem
-mode = args.buildmode
 mpi = args.mpi
+build_mode = args.build_mode
 other_bm = args.other_benchmarks
+
 
 
 def runcommand(command):
@@ -53,24 +50,20 @@ def runcommand(command):
 
 def build_libfabric(mode=None):
 
-        if (mode == 'debug'):
-            libfab_installpath = "{}/debug".format(install_path) 
-            config_cmd = ['./configure','--prefix={}'.format(libfab_installpath), '--enable-debug',
+        if (mode == 'dbg'):
+            config_cmd = ['./configure','--prefix={}'.format(install_path), '--enable-debug',
                           '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=yes',
                           '--enable-verbs=yes', '--enable-rxd=yes', '--enable-rxm=yes', 
                           '--enable-sockets=yes', '--enable-tcp=yes', '--enable-udp=yes',
-                          '--enable-rxd=yes', '--enable-shm=yes', '--with-psm2-src={}/opa-psm2-lib'.format(workspace)]   
-
+                          '--enable-rxd=yes', '--enable-shm=yes', '--with-psm2-src={}/opa-psm2-lib'.format(workspace)]
         elif(mode == 'dl'):
-            libfab_installpath = "{}/dl".format(install_path)
-            config_cmd = ['./configure','--prefix={}'.format(libfab_installpath),
+            config_cmd = ['./configure','--prefix={}'.format(install_path),
                           '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=dl',
                           '--enable-verbs=dl', '--enable-rxd=dl', '--enable-rxm=dl', 
                           '--enable-sockets=dl', '--enable-tcp=dl', '--enable-udp=dl',
                           '--enable-rxd=dl', '--enable-shm=dl', '--with-psm2-src={}/opa-psm2-lib'.format(workspace)]
         else:
-            libfab_installpath = install_path
-            config_cmd = ['./configure','--prefix={}'.format(libfab_installpath),
+            config_cmd = ['./configure','--prefix={}'.format(install_path),
                           '--enable-usnic=no', '--enable-psm=no', '--enable-psm2=yes',
                           '--enable-verbs', '--enable-rxd=yes', '--enable-rxm=yes', 
                           '--enable-sockets=yes', '--enable-tcp=yes', '--enable-udp=yes',
@@ -87,22 +80,17 @@ def build_libfabric(mode=None):
         runcommand(['make','install'])
 
 def build_fabtests(mode=None):
-  
-     
-    fabtest_installpath =  install_path
+       
     os.chdir('{}/fabtests'.format(workspace))
-    runcommand(['./autogen.sh'])
-    config_cmd = ['./configure', '--prefix={}'.format(fabtest_installpath),
-                '--with-libfabric={}'.format(fabtest_installpath)]
-    if (mode == 'debug'):   
-        fabtest_installpath = "{}/{}".format(install_path,mode)
-        config_cmd = ['./configure', '--enable-debug', '--prefix={}'.format(fabtest_installpath),
-                '--with-libfabric={}'.format(fabtest_installpath)]
-    elif (mode == 'dl'):
-         fabtest_installpath = "{}/{}".format(install_path,mode)
-         config_cmd = ['./configure', '--prefix={}'.format(fabtest_installpath),
-                '--with-libfabric={}'.format(fabtest_installpath)]                   
+    if (mode == 'dbg'):   
+        config_cmd = ['./configure', '--enable-debug', '--prefix={}'.format(install_path),
+                '--with-libfabric={}'.format(install_path)] 
+    else:
+        config_cmd = ['./configure', '--prefix={}'.format(install_path),
+                '--with-libfabric={}'.format(install_path)]
 
+
+    runcommand(['./autogen.sh'])
     runcommand(config_cmd)
     runcommand(['make','clean'])
     runcommand(['make'])
@@ -141,16 +129,18 @@ def build_stress_bm(mpi, mpi_install_path):
     stress_install_path = "{}/stress".format(mpi_install_path)
     if (os.path.exists(stress_install_path) == False):
         os.makedirs(stress_install_path)
-    os.chdir(stress_install_path)
- 
-    if (mpi == 'mpich'):
+     
+    if (mpi == 'impi'):
         os.environ['LD_LIBRARY_PATH'] = "{}/lib".format(install_path)
+        mpicc_path = "{}/intel64/bin/mpicc".format(ci_site_config.impi_root) 
+    else:
+        os.environ['LD_LIBRARY_PATH'] = ""
+        mpicc_path = "{}/bin/mpicc".format(mpi_install_path)
 
-    cmd=" ".join(["{}/intel64/bin/mpicc" \
-                    .format(ci_site_config.impi_root), \
-                    '-lz', "{}/mpi_stress/mpi_stress.c" \
-                    .format(ci_site_config.benchmarks['wfr-mpi-tests']),
-                    '-o', "{}/mpi_stress".format(stress_install_path)])
+    cmd=" ".join([mpicc_path, '-lz', "{}/mpi_stress/mpi_stress.c" \
+                 .format(ci_site_config.benchmarks['wfr-mpi-tests']),\
+                  '-o', "{}/mpi_stress".format(stress_install_path)])
+
     runcmd = shlex.split(cmd)
     runcommand(runcmd)
  
@@ -180,15 +170,27 @@ def build_osu_bm(mpi, mpi_install_path):
     runcommand(["make", "-j4"])
     runcommand(["make", "install"])
 
+
+
+if (build_mode):
+    install_path = "{installdir}/{brname}/{bno}/{bmode}" \
+                .format(installdir=ci_site_config.install_dir,
+                        brname=branchname, bno=buildno,bmode=build_mode)
+else:
+    install_path = "{installdir}/{brname}/{bno}/reg" \
+                .format(installdir=ci_site_config.install_dir,
+                        brname=branchname, bno=buildno)
+
+
+
 if (builditem):
     if (builditem == 'libfabric'):
-        build_libfabric(mode)
+        build_libfabric(build_mode)
     elif (builditem == 'fabtests'):
-        build_fabtests(mode)
+        build_fabtests(build_mode)
 
 if (mpi):
-
-    mpi_install_path = "{}/{}".format(install_path, mpi)   
+    mpi_install_path = "{}/{}".format(install_path, mpi) 
     if (os.path.exists(mpi_install_path) == False):
         os.makedirs(mpi_install_path) 
     if (mpi == 'impi'):

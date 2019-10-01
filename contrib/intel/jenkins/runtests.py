@@ -11,7 +11,7 @@ parser.add_argument("test_node",help="the test node on which this test must be e
 parser.add_argument("core", help="core provider", choices=["psm2", "verbs", "tcp",
                     "udp", "sockets", "shm"])
 parser.add_argument("--build_mode", help="specify the build configuration", 
-                     choices = ["debug", "dl"])
+                     choices = ["dbg", "dl"])
 args = parser.parse_args()
 node = args.test_node
 args_prov = args.core
@@ -37,14 +37,14 @@ for prov in common.prov_list:
     if (prov.core == args_prov):
             #fabtests
         if (prov.util == None):
-            run.fabtests(prov.core, hosts)
+            #run.fabtests(prov.core, hosts, mode=build_mode)
             for mpi in mpilist:
-                run.intel_mpi_benchmark(prov.core, hosts, mpi)   
-                #run.mpistress_benchmark(prov.core, hosts, mpi)
-                run.osu_benchmark(prov.core, hosts, mpi)  
+                #run.intel_mpi_benchmark(prov.core, hosts, mpi, mode=build_mode)   
+                run.mpistress_benchmark(prov.core, hosts, mpi, mode=build_mode)
+                #run.osu_benchmark(prov.core, hosts, mpi, mode=build_mode)  
         else:
-            run.fabtests(prov.core, hosts, prov.util)
+            #run.fabtests(prov.core, hosts, util=prov.util, mode=build_mode)
             for mpi in mpilist:
-                run.intel_mpi_benchmark(prov.core, hosts, mpi, prov.util)
-                #run.mpistress_benchmark(prov.core, hosts, mpi, prov.util)
-                run.osu_benchmark(prov.core, hosts, mpi, prov.util)        
+               #run.intel_mpi_benchmark(prov.core, hosts, mpi, util=prov.util, mode=build_mode)
+                run.mpistress_benchmark(prov.core, hosts, mpi, util=prov.util, mode=build_mode)
+               # run.osu_benchmark(prov.core, hosts, mpi, util=prov.util, mode=build_mode)        

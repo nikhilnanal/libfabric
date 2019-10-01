@@ -34,11 +34,11 @@ bno = os.environ['BUILD_NUMBER']#args.buildno
 
 os.chdir('/tmp/')
 #runfabtests
-def fabtests(core, hosts, util=None):
+def fabtests(core, hosts, util=None, mode=None):
        print("running fabtests for {}-{}-{}".format(core, util, fab))
        runfabtest = tests.Fabtest(branchname=brname,buildno=bno,\
                     testname="runfabtests", core_prov=core, fabric=fab,\
-                         hosts=hosts, util_prov=util)
+                         hosts=hosts, util_prov=util, build_mode=mode)
 
        if (runfabtest.execute_condn):
             runfabtest.execute_cmd()
@@ -49,10 +49,10 @@ def fabtests(core, hosts, util=None):
     
 
 #imb-tests
-def intel_mpi_benchmark(core, hosts, mpi, util=None):
+def intel_mpi_benchmark(core, hosts, mpi, util=None, mode=None):
     imb_test = tests.MpiTestIMB(branchname=brname,buildno=bno,\
                testname="IntelMPIbenchmark",core_prov=core, fabric=fab,\
-               hosts=hosts, util_prov=util, mpitype=mpi)
+               hosts=hosts, util_prov=util, mpitype=mpi, build_mode=mode)
     
     if (imb_test.execute_condn == True  and imb_test.mpi_gen_execute_condn == True):
         print("running imb-test for {}-{}-{}-{}".format(core, util, fab, mpi))
@@ -63,10 +63,10 @@ def intel_mpi_benchmark(core, hosts, mpi, util=None):
     print("----------------------------------------------------------------------------------------\n")
     
 #mpi_stress benchmark tests
-def mpistress_benchmark(core, hosts, mpi, util=None):
+def mpistress_benchmark(core, hosts, mpi, util=None, mode=None):
     stress_test = tests.MpiTestStress(branchname=brname,buildno=bno,\
                   testname="stress",core_prov=core, fabric=fab, hosts=hosts, \
-                  util_prov=util,mpitype=mpi)
+                  util_prov=util,mpitype=mpi, build_mode=mode)
  
     if (stress_test.execute_condn == True and stress_test.mpi_gen_execute_condn == True):
         print("running mpistress-test for {}-{}-{}-{}".format(core, util, fab, mpi))
@@ -77,10 +77,10 @@ def mpistress_benchmark(core, hosts, mpi, util=None):
     print("----------------------------------------------------------------------------------------\n")
 
 #osu benchmark tests    
-def osu_benchmark(core, hosts, mpi, util=None):
+def osu_benchmark(core, hosts, mpi, util=None, mode=None):
     osu_test = tests.MpiTestOSU(branchname=brname, buildno=bno, \
                testname="osu-benchmarks",core_prov=core, fabric=fab,  \
-               hosts=hosts, mpitype=mpi, util_prov=util)
+               hosts=hosts, mpitype=mpi, util_prov=util, build_mode=mode)
     
     if (osu_test.execute_condn == True and osu_test.mpi_gen_execute_condn == True):
         print("running osu-test for {}-{}-{}-{}".format(core, util, fab, mpi))

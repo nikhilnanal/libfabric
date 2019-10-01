@@ -12,7 +12,7 @@ import shlex
 
 class Test:
     def __init__ (self, branchname, buildno, testname, core_prov, fabric,
-                  hosts, util_prov=None):
+                  hosts, util_prov=None, build_mode=None):
         self.branchname = branchname
         self.buildno = buildno
         self.testname = testname
@@ -20,13 +20,22 @@ class Test:
         self.util_prov = "ofi_{}".format(util_prov) if util_prov != None else "" 
         self.fabric = fabric
         self.hosts = hosts
+        self.build_mode = build_mode
         if (len(hosts) == 2):
             self.server = hosts[0]
             self.client = hosts[1]
        
         self.nw_interface = ci_site_config.interface_map[self.fabric]
-        self.libfab_installpath = "{}/{}/{}".format(ci_site_config.install_dir,
-                                  self.branchname, self.buildno) 
+        if (self.build_mode == None):
+            self.libfab_installpath = "{}/{}/{}/reg".format(ci_site_config.install_dir,
+                                  self.branchname, self.buildno)
+        elif (self.build_mode == 'dbg'):
+            self.libfab_installpath =  "{}/{}/{}/dbg".format(ci_site_config.install_dir,
+                                  self.branchname, self.buildno)
+        elif (self.build_mode == 'dl'):
+            self.libfab_installpath =  "{}/{}/{}/dl".format(ci_site_config.install_dir,
+                                  self.branchname, self.buildno)
+
  
         self.env = [("FI_VERBS_MR_CACHE_ENABLE", "1"),\
                     ("FI_VERBS_INLINE_SIZE", "256")] \
@@ -54,10 +63,10 @@ class Test:
 class Fabtest(Test):
     
     def __init__(self, branchname, buildno, testname, core_prov, fabric,
-                 hosts, util_prov=None):
+                 hosts, util_prov=None, build_mode=None):
         
         super().__init__(branchname, buildno, testname, core_prov, fabric,
-                         hosts, util_prov)
+                         hosts, util_prov, build_mode)
         self.fabtestpath = "{}/bin".format(self.libfab_installpath) 
     
     def get_exclude_file(self):
@@ -129,7 +138,8 @@ class Fabtest(Test):
    
     @property
     def execute_condn(self):
-        return True
+        return True if (self.core!='shm' or \
+                        self.build_mode == 'dbg') else False
 
     def execute_cmd(self):
         command = self.cmd + self.options
@@ -137,10 +147,10 @@ class Fabtest(Test):
 
 class MpiTests(Test):
     def __init__(self, branchname, buildno, testname, core_prov, fabric,
-                 mpitype, hosts, util_prov=None):
+                 mpitype, hosts, util_prov=None, build_mode=None):
        
         super().__init__(branchname, buildno, testname, core_prov, 
-                         fabric, hosts, util_prov)
+                         fabric, hosts, util_prov, build_mode)
         self.mpi = mpitype
 
 
@@ -201,16 +211,18 @@ class MpiTests(Test):
 
     @property
     def mpi_gen_execute_condn(self):
-        return True if (self.core_prov != "udp" and self.core_prov != "shm" and \
-                       (self.core_prov != "verbs" or self.util_prov == "ofi_rxm" or \
-                        self.util_prov == "ofi_rxd")) else False
+        return True if (self.core_prov != "udp" and \
+                        self.core_prov != "shm" and \
+                       (self.core_prov != "verbs" or \
+                       self.util_prov == "ofi_rxm" or \
+                       self.util_prov == "ofi_rxd")) else False
 
 class MpiTestIMB(MpiTests):
 
     def __init__(self, branchname, buildno, testname, core_prov, fabric,
-                 mpitype, hosts, util_prov=None):
+                 mpitype, hosts, util_prov=None, build_mode=None):
         super().__init__(branchname, buildno, testname, core_prov, fabric,
-                         mpitype, hosts, util_prov)
+                         mpitype, hosts, util_prov, build_mode)
         self.additional_tests = [ 
                                    "Biband",
                                    "Uniband",
@@ -239,9 +251,9 @@ class MpiTestIMB(MpiTests):
 class MpiTestStress(MpiTests):
      
     def __init__(self, branchname, buildno, testname, core_prov, fabric, 
-                 hosts, mpitype, util_prov=None):
+                 hosts, mpitype, util_prov=None, build_mode=None):
         super().__init__(branchname, buildno, testname, core_prov, fabric, 
-                         mpitype,  hosts, util_prov)
+                         mpitype,  hosts, util_prov, build_mode)
         
          
         if((self.core_prov == "verbs" or self.core_prov =="psm2")):
@@ -257,9 +269,8 @@ class MpiTestStress(MpiTests):
 
     @property
     def execute_condn(self):
-        return True if (self.core_prov != "udp" and self.core_prov != "shm" and \
-                       (self.core_prov != "verbs" or self.util_prov == "ofi_rxm" or \
-                        self.util_prov == "ofi_rxd")) else  False
+        return True if (self.mpi != 'ompi' or \
+                        self.build_mode != 'dbg') else  False
     
     def execute_cmd(self):
         command = self.cmd + self.options + self.stress_cmd
@@ -268,9 +279,9 @@ class MpiTestStress(MpiTests):
 class MpiTestOSU(MpiTests):
 
     def __init__(self, branchname, buildno, testname, core_prov, fabric,
-                 hosts, mpitype, util_prov=None):
+                 hosts, mpitype, util_prov=None, build_mode=None):
         super().__init__(branchname, buildno, testname, core_prov, fabric,
-                         mpitype, hosts, util_prov)
+                         mpitype, hosts, util_prov, build_mode)
         
         self.n = 4 
         self.ppn = 2
@@ -292,8 +303,11 @@ class MpiTestOSU(MpiTests):
     
     @property
     def execute_condn(self): 
-        return True if (self.mpi != "ompi" or (self.core_prov != "sockets" and self.core_prov != "psm2")) \
-                     else False
+        return True if (self.mpi != "ompi" or \
+                       (self.core_prov != "sockets" and \
+                        self.core_prov != "psm2" and \
+                        self.build_mode!="dbg")) \
+                    else False
     
     def execute_cmd(self):
         assert(self.osu_mpi_path)
