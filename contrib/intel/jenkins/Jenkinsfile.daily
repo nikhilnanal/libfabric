@@ -126,7 +126,7 @@ pipeline {
                         }
                      }
                  } 
-                 stage('eth-udp_rxd') {
+                 stage('eth-udp-rxd-shm') {
                      agent {node {label 'eth'}}
                      steps{
                         withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/:$PYTHONPATH'])
@@ -136,7 +136,8 @@ pipeline {
                             (
                                 cd  ${env.WORKSPACE}/contrib/intel/jenkins/ 
                                 python3.7 runtests.py --prov=udp 
-                                python3.7 runtests.py --prov=udp --util=rxd               
+                                python3.7 runtests.py --prov=udp --util=rxd
+                                python3.7 runtests.py --prov=shm               
                             )                              
                           """
                         }
@@ -251,7 +252,7 @@ pipeline {
                         } 
                      }       
                  }
-                 stage('eth-udp_rxd-dbg') {
+                 stage('eth-udp-rxd-shm-dbg') {
                      agent {node {label 'eth'}}
                      steps{
                         withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/:$PYTHONPATH'])
@@ -261,7 +262,8 @@ pipeline {
                             ( 
                                 cd  ${env.WORKSPACE}/contrib/intel/jenkins/
                                 python3.7 runtests.py --prov=udp --ofi_build_mode='dbg'
-                                python3.7 runtests.py --prov=udp --util=rxd --ofi_build_mode='dbg'               
+                                python3.7 runtests.py --prov=udp --util=rxd --ofi_build_mode='dbg'
+                                python3.7 runtests.py --prov=shm --ofi_build_mode='dbg'
                             )  
                           """
                         } 
@@ -371,7 +373,7 @@ pipeline {
                      }       
        
                  }
-                 stage('eth-udp_rxd-dl') {
+                 stage('eth-udp-rxd-shm-dl') {
                     agent {node {label 'eth'}}
                     steps{
                        withEnv(['PATH+EXTRA=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/:$PYTHONPATH'])
@@ -382,6 +384,7 @@ pipeline {
                                 cd  ${env.WORKSPACE}/contrib/intel/jenkins/
                                 python3.7 runtests.py --prov=udp --ofi_build_mode='dl'
                                 python3.7 runtests.py --prov=udp --util=rxd --ofi_build_mode='dl'
+                                python3.7 runtests.py --prov=shm --ofi_build_mode='dl'
                             )  
                         """
                         } 
@@ -468,6 +471,8 @@ pipeline {
    }        
 
   }
+
+
   
   post {
     failure {
@@ -486,6 +491,6 @@ pipeline {
             }
         }
     }
-}
+ }
 
 }
