@@ -220,9 +220,12 @@ class MpiTests(Test):
     def options(self):
         opts = [] 
         if (self.mpi == "impi" or self.mpi == "mpich"):
-            opts = "-n {} -ppn {} -hosts {},{} ".format(self.n,self.ppn,
-                    self.server,self.client)
-                
+            opts = "-n {} -ppn {} ".format(self.n,self.ppn)
+            if (self.core_prov == "shm"):
+                opts = "{} -hosts {},{} ".format(opts, self.server, self.server)
+            else:
+                opts = "{} -hosts {},{} ".format(opts, self.server, self.client)
+    
             if (self.mpi == "impi"):
                 opts = "{} -mpi_root={} ".format(opts, 
                         ci_site_config.impi_root)
@@ -244,7 +247,12 @@ class MpiTests(Test):
             
         elif (self.mpi == "ompi"):
             opts = "-np {} ".format(self.n)
-            hosts = ",".join([":".join([host,str(self.ppn)]) \
+            
+            if (self.core_prov == "shm"):
+                hosts = "{}:{},{}:{}".format(self.server, str(self.ppn), \
+                         self.server,str(self.ppn))
+            else:
+                hosts = ",".join([":".join([host,str(self.ppn)]) \
                     for host in self.hosts])
             
             opts = "{} --host {} ".format(opts, hosts)
@@ -268,7 +276,6 @@ class MpiTests(Test):
         # we would still have MPI tests runnning for 
         # verbs-rxd and verbs-rxm providers
         return True if (self.core_prov != "udp" and \
-                        self.core_prov != "shm" and \
                        (self.core_prov != "verbs" or \
                        self.util_prov == "ofi_rxm" or \
                        self.util_prov == "ofi_rxd")) else False
@@ -319,10 +326,15 @@ class MpiTestStress(MpiTests):
         else:
             self.n = 4
             self.ppn = 2
-      
+
+        if (self.core_prov == "shm"):
+            self.stress_opts = "-dcrs"
+        else:
+            self.stress_opts = "-dcr"
+         
     @property
     def stress_cmd(self):
-        return "{}/{}/stress/mpi_stress -dcr".format(self.libfab_installpath, self.mpi)
+        return "{}/{}/stress/mpi_stress ".format(self.libfab_installpath, self.mpi)
 
     @property
     def execute_condn(self):
@@ -336,7 +348,8 @@ class MpiTestStress(MpiTests):
                         self.ofi_build_mode != 'dbg')) else  False
     
     def execute_cmd(self):
-        command = self.cmd + self.options + self.stress_cmd
+
+        command = self.cmd + self.options + self.stress_cmd + self.stress_opts
         outputcmd = shlex.split(command)
         common.run_command(outputcmd) 
 
