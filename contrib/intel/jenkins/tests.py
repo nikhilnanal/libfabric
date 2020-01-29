@@ -332,8 +332,7 @@ class MpiTestStress(MpiTests):
         # Due to an mpich issue when the correct mpich options are enabled during
         # mpich builds, sttress test is failing. disabling mpich + stress tests
         # untill the mpich team fixes the issue. 
-        return True if (self.mpi != 'mpich' and (self.mpi != 'ompi' or \
-                        self.ofi_build_mode != 'dbg')) else  False
+        return True if (self.mpi != 'mpich') else  False
     
     def execute_cmd(self):
         command = self.cmd + self.options + self.stress_cmd
