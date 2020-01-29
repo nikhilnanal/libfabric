@@ -372,8 +372,7 @@ class MpiTestOSU(MpiTests):
         # sockets and psm2 have some issues with OSU benchmark testing.
         return True if (self.mpi != "ompi" or \
                        (self.core_prov != "sockets" and \
-                        self.core_prov != "psm2" and \
-                        self.ofi_build_mode!="dbg")) \
+                        self.core_prov != "psm2")) \
                     else False
     
     def execute_cmd(self):
