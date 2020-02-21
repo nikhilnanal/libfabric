@@ -243,7 +243,7 @@ if __name__ == "__main__":
         if (os.path.exists(mpi_install_path) == False):
             os.makedirs(mpi_install_path) 
         if (mpi != 'impi'):
-            mpisrc = ci_site_config.mpich_src if mpi == 'mpich' \
+            mpisrc = '/home/build/workspace/mpich' if mpi == 'mpich' \
                      else ci_site_config.ompi_src
             # only need to build ompi or mpich, impi is available as binary
             build_mpi(mpi, mpisrc, mpi_install_path, install_path, ofi_build_mode)
