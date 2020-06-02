@@ -267,11 +267,12 @@ class MpiTests(Test):
         #Skip MPI tests for udp, verbs(core) providers.
         # we would still have MPI tests runnning for 
         # verbs-rxd and verbs-rxm providers
-        return True if (self.core_prov != "udp" and \
-                        self.core_prov != "shm" and \
+        return True if (self.core_prov != "shm" and \
                        (self.core_prov != "verbs" or \
                        self.util_prov == "ofi_rxm" or \
-                       self.util_prov == "ofi_rxd")) else False
+                       self.util_prov == "ofi_rxd") and \
+                       (self.core_prov != "udp" or \
+                        self.util_prov == "ofi_rxd")) else False
 
 # IMBtests serves as an abstract class for different
 # types of intel MPI benchmarks. Currently we have
@@ -405,7 +406,8 @@ class MpichTestSuite(MpiTests):
 
     @property
     def execute_condn(self):
-        return True if (self.mpi == 'impi' and  self.core_prov != 'psm2') else False
+        return True if (self.mpi == 'impi' and  self.core_prov != 'psm2' and \
+                        self.core_prov != 'sockets') else False
  
     def execute_cmd(self, testgroupname):
         print("Running Tests: " + testgroupname)
