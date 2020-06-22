@@ -32,9 +32,8 @@ class Test:
         self.libfab_installpath = "{}/{}/{}/{}".format(ci_site_config.install_dir,
                                   self.jobname, self.buildno, self.ofi_build_mode)
  
-        self.env = [("FI_VERBS_MR_CACHE_ENABLE", "1"),\
-                    ("FI_VERBS_INLINE_SIZE", "256")] \
-                    if self.core_prov == "verbs" else []
+        self.env = [("FI_VERBS_MAX_INLINE_SIZE", "256")] if self.core_prov == "verbs" else []
+
 class FiInfoTest(Test):
     def __init__(self, jobname, buildno, testname, core_prov, fabric,
                  hosts, ofi_build_mode, util_prov=None):
@@ -454,8 +453,8 @@ class MpiTestStress(MpiTests):
         # Due to an mpich issue when the correct mpich options are enabled during
         # mpich builds, sttress test is failing. disabling mpich + stress tests
         # untill the mpich team fixes the issue. 
-        return True if (self.mpi != 'mpich' and (self.mpi != 'ompi' or \
-                        self.ofi_build_mode != 'dbg')) else  False
+        return True if (self.mpi != 'ompi' or \
+                        self.ofi_build_mode != 'dbg') else  False
     
     def execute_cmd(self):
         command = self.cmd + self.options + self.stress_cmd
@@ -510,7 +509,7 @@ class MpiTestOSU(MpiTests):
                 else:
                     self.n=4
                     self.ppn=2
-                # for sockets provider skip 'osu_put' benchmark tests as they fail.
+                #for sockets provider skip 'osu_put' benchmark tests as they fail.
                 if(self.core_prov !='sockets' or p.search(test)== None):
                     launcher = self.cmd + self.options
                     osu_cmd = os.path.join(root, test)
