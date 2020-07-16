@@ -117,7 +117,7 @@ static int rxd_progress_unexp_list(struct rxd_ep *ep,
 					rx_entry->cq_entry.tag, rx_entry->ignore);
 		if (!unexp_msg)
 			return 0;
-
+		//printf("found unexpected msg:%d\n", unexp_msg->base_hdr->peer);
 		total_size = unexp_msg->sar_hdr ? unexp_msg->sar_hdr->size :
 			     unexp_msg->msg_size;
 
@@ -231,15 +231,16 @@ ssize_t rxd_ep_generic_recvmsg(struct rxd_ep *rxd_ep, const struct iovec *iov,
 		goto out;
 	}
 	if (!(flags & FI_DISCARD)) {
+		//printf("fi_addr_generic_recv:%d\n", addr);
 		rxd_addr = (intptr_t) ofi_idx_lookup(&(rxd_ep_av(rxd_ep)->fi_addr_idx), 
 						     RXD_IDX_OFFSET(addr));
 		if (!rxd_addr)
 			addr = FI_ADDR_UNSPEC;
-
+		//printf("rxd_addr_generic_recv:%d\n", rxd_addr);
 		rx_entry = rxd_rx_entry_init(rxd_ep, iov, iov_count, tag, ignore, context,
 					(rxd_ep->util_ep.caps & FI_DIRECTED_RECV &&
 					addr != FI_ADDR_UNSPEC) ? rxd_addr : 
-					FI_ADDR_UNSPEC, op, rxd_flags);
+					0, op, rxd_flags);
 		if (!rx_entry) {
 			ret = -FI_EAGAIN;
 		} else if (flags & FI_CLAIM) {
@@ -382,7 +383,7 @@ ssize_t rxd_ep_generic_inject(struct rxd_ep *rxd_ep, const struct iovec *iov,
 		goto out;
 	}
 
-	if (rxd_peer(rxd_ep, rxd_addr)->peer_addr != FI_ADDR_UNSPEC)
+	if (rxd_peer(rxd_ep, rxd_addr)->peer_addr != RXD_ADDR_INVALID)
 		(void) rxd_start_xfer(rxd_ep, tx_entry);
 
 out:
@@ -409,12 +410,14 @@ ssize_t rxd_ep_generic_sendmsg(struct rxd_ep *rxd_ep, const struct iovec *iov,
 
 	if (ofi_cirque_isfull(rxd_ep->util_ep.tx_cq->cirq))
 		goto out;
+	//printf("fi_addr_generic_send : %d\n", addr);
 	
 	rxd_addr = (intptr_t) ofi_idx_lookup(&(rxd_ep_av(rxd_ep)->fi_addr_idx), 
 					     RXD_IDX_OFFSET(addr));
 	if (!rxd_addr)
 		goto out;
-	
+	//printf("rxd_addr_generic_send : %d\n", rxd_addr);
+
 	ret = rxd_send_rts_if_needed(rxd_ep, rxd_addr);
 	if (ret)
 		goto out;
@@ -424,7 +427,7 @@ ssize_t rxd_ep_generic_sendmsg(struct rxd_ep *rxd_ep, const struct iovec *iov,
 	if (!tx_entry)
 		goto out;
 
-	if (rxd_peer(rxd_ep, rxd_addr)->peer_addr == FI_ADDR_UNSPEC)
+	if (rxd_peer(rxd_ep, rxd_addr)->peer_addr == RXD_ADDR_INVALID)
 		goto out;
 
 	ret = rxd_start_xfer(rxd_ep, tx_entry);
