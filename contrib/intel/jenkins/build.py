@@ -88,12 +88,13 @@ def build_shmem(shmem_dir, libfab_install_path):
 def build_ISx(shmem_dir):
     
     oshcc = '{}/bin/oshcc'.format(shmem_dir)
+    tmp_isx_src = '/home/build/ci_shmemtests/ISx'
+    #os.chdir(shmem_dir)
+    shutil.copytree(tmp_isx_src, '{}/ISx'.format(shmem_dir))
+    #git_cmd = ['git', 'clone', '--depth', '1', 'https://github.com/ParRes/ISx.git', 'ISx']
     
-    os.chdir(shmem_dir)
-    git_cmd = ['git', 'clone', '--depth', '1', 'https://github.com/ParRes/ISx.git', 'ISx']
-    
-    common.run_command(git_cmd) 
-    os.chdir('ISx/SHMEM')
+    #common.run_command(git_cmd) 
+    os.chdir('{}/ISx/SHMEM'.format(shmem_dir))
     common.run_command(['make', 'CC={}'.format(oshcc), 'LDLIBS=-lm']) 
                   
     
@@ -276,8 +277,8 @@ if __name__ == "__main__":
         shmem_dir = "{}/shmem".format(install_path)
         build_shmem(shmem_dir, install_path)
         build_ISx(shmem_dir)
-        build_PRK(shmem_dir)
-        build_uh(shmem_dir)
+        #build_PRK(shmem_dir)
+        #build_uh(shmem_dir)
     
 
 

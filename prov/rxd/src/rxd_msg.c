@@ -43,6 +43,9 @@ static int rxd_match_unexp(struct dlist_entry *item, const void *arg)
 
 	unexp_msg = container_of(item, struct rxd_unexp_msg, entry);
 
+//	printf("attr->peer:%d\n", attr->peer);
+//	printf("unexp->msg->base_hdr->peer: %d\n", unexp_msg->base_hdr->peer);
+
 	if (!rxd_match_addr(attr->peer, unexp_msg->base_hdr->peer))
 		return 0;
 
@@ -202,7 +205,7 @@ ssize_t rxd_ep_generic_recvmsg(struct rxd_ep *rxd_ep, const struct iovec *iov,
 	struct rxd_x_entry *rx_entry;
 	struct dlist_entry *unexp_list, *rx_list;
 	struct rxd_unexp_msg *unexp_msg;
-	fi_addr_t rxd_addr;
+	fi_addr_t rxd_addr = RXD_ADDR_INVALID;
 
 	
 	assert(iov_count <= RXD_IOV_LIMIT);
@@ -224,23 +227,22 @@ ssize_t rxd_ep_generic_recvmsg(struct rxd_ep *rxd_ep, const struct iovec *iov,
 		unexp_list = &rxd_ep->unexp_list;
 		rx_list = &rxd_ep->rx_list;
 	}
+	if (rxd_ep->util_ep.caps & FI_DIRECTED_RECV &&
+	    addr != FI_ADDR_UNSPEC) {
+		rxd_addr = (intptr_t) ofi_idx_lookup(&(rxd_ep_av(rxd_ep)->fi_addr_idx), 
+						     RXD_IDX_OFFSET(addr));
+	}
 
 	if (flags & FI_PEEK) {
-		ret = rxd_peek_recv(rxd_ep, addr, tag, ignore, context, flags,
+		ret = rxd_peek_recv(rxd_ep, rxd_addr, tag, ignore, context, flags,
 				    unexp_list);
 		goto out;
 	}
 	if (!(flags & FI_DISCARD)) {
 		//printf("fi_addr_generic_recv:%d\n", addr);
-		rxd_addr = (intptr_t) ofi_idx_lookup(&(rxd_ep_av(rxd_ep)->fi_addr_idx), 
-						     RXD_IDX_OFFSET(addr));
-		if (!rxd_addr)
-			addr = FI_ADDR_UNSPEC;
 		//printf("rxd_addr_generic_recv:%d\n", rxd_addr);
 		rx_entry = rxd_rx_entry_init(rxd_ep, iov, iov_count, tag, ignore, context,
-					(rxd_ep->util_ep.caps & FI_DIRECTED_RECV &&
-					addr != FI_ADDR_UNSPEC) ? rxd_addr : 
-					0, op, rxd_flags);
+					     rxd_addr, op, rxd_flags);
 		if (!rx_entry) {
 			ret = -FI_EAGAIN;
 		} else if (flags & FI_CLAIM) {
