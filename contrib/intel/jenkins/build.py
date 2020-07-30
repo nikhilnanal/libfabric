@@ -88,9 +88,9 @@ def build_shmem(shmem_dir, libfab_install_path):
 def build_ISx(shmem_dir):
     
     oshcc = '{}/bin/oshcc'.format(shmem_dir)
-    tmp_isx_src = '/home/build/ci_shmemtests/ISx'
+    tmp_isx_src = '{}/ISx'.format(ci_site_config.shmem_root)
+    shutil.copytree(tmp_isx_src, '{}/ISx'.format(shmem_dir)) 
     #os.chdir(shmem_dir)
-    shutil.copytree(tmp_isx_src, '{}/ISx'.format(shmem_dir))
     #git_cmd = ['git', 'clone', '--depth', '1', 'https://github.com/ParRes/ISx.git', 'ISx']
     
     #common.run_command(git_cmd) 
@@ -102,10 +102,12 @@ def build_PRK(shmem_dir):
     
     oshcc = '{}/bin/oshcc'.format(shmem_dir)
     shmem_src = '{}/SOS'.format(shmem_dir)
-    os.chdir(shmem_dir)
-    git_cmd = ['git', 'clone', '--depth', ' 1', 'https://github.com/ParRes/Kernels.git', 'PRK']
-    common.run_command(git_cmd)
-    os.chdir('PRK')
+    tmp_prk_src = '{}/PRK'.format(ci_site_config.shmem_root)
+    shutil.copytree(tmp_prk_src, '{}/PRK'.format(shmem_dir))
+    #os.chdir(shmem_dir)
+    #git_cmd = ['git', 'clone', '--depth', ' 1', 'https://github.com/ParRes/Kernels.git', 'PRK']
+    #common.run_command(git_cmd)
+    os.chdir('{}/PRK'.format(shmem_dir))
     with open('common/make.defs','w') as f:
         f.write('SHMEMCC={} -std=c99\nSHMEMTOP={}\n'.format(oshcc,shmem_src))
 
@@ -114,12 +116,12 @@ def build_PRK(shmem_dir):
 def build_uh(shmem_dir):
     oshcc_bin = "{}/bin".format(shmem_dir)
     os.environ["PATH"] += os.pathsep + oshcc_bin
-   
-   
-    os.chdir(shmem_dir) 
-    git_cmd = ['git', 'clone', '--depth', '1', 'https://github.com/openshmem-org/tests-uh.git', 'tests-uh'] 
-    common.run_command(git_cmd)
-    os.chdir('tests-uh')
+    tmp_uh_src = '{}/tests-uh'.format(ci_site_config.shmem_root)
+    shutil.copytree(tmp_uh_src, '{}/tests-uh'.format(shmem_dir))
+    #os.chdir(shmem_dir) 
+    #git_cmd = ['git', 'clone', '--depth', '1', 'https://github.com/openshmem-org/tests-uh.git', 'tests-uh'] 
+    #common.run_command(git_cmd)
+    os.chdir('{}/tests-uh'.format(shmem_dir))
     common.run_command(['make', '-j4', 'C_feature_tests'])
     
 
@@ -277,8 +279,8 @@ if __name__ == "__main__":
         shmem_dir = "{}/shmem".format(install_path)
         build_shmem(shmem_dir, install_path)
         build_ISx(shmem_dir)
-        #build_PRK(shmem_dir)
-        #build_uh(shmem_dir)
+        build_PRK(shmem_dir)
+        build_uh(shmem_dir)
     
 
 
