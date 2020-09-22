@@ -789,11 +789,11 @@ int ft_getinfo(struct fi_info *hints, struct fi_info **info)
 		return ret;
 	}
 
-	if (!ft_check_prefix_forced(*info, &opts)) {
+/*	if (!ft_check_prefix_forced(*info, &opts)) {
 		FT_ERR("Provider disabled requested prefix mode.");
 		return -FI_ENODATA;
 	}
-
+*/
 	return 0;
 }
 
