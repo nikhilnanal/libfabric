@@ -125,6 +125,8 @@ struct rxd_domain {
 struct rxd_peer {
 	struct dlist_entry entry;
 	fi_addr_t peer_addr;
+	fi_addr_t rxd_addr;
+
 	uint64_t tx_seq_no;
 	uint64_t rx_seq_no;
 	uint64_t last_rx_ack;
@@ -132,6 +134,10 @@ struct rxd_peer {
 	uint16_t rx_window;
 	uint16_t tx_window;
 	int retry_cnt;
+	int ack_retry_cnt;
+
+		
+	uint64_t ack_timeout;	
 
 	uint64_t Oorder;
 	uint64_t Inorder;
@@ -438,8 +444,15 @@ int rxd_av_insert_dg_addr(struct rxd_av *av, const void *addr,
 int rxd_ep_post_buf(struct rxd_ep *ep);
 void rxd_ep_send_ack(struct rxd_ep *rxd_ep, fi_addr_t peer);
 
+
 void rxd_ep_send_sack(struct rxd_ep *rxd_ep, fi_addr_t peer, 
 		      uint64_t start_seqno, uint64_t end_seqno);
+
+
+
+void rxd_ep_resend_ack(struct rxd_ep *rxd_ep, struct rxd_peer *peer);
+
+ 
 
 struct rxd_pkt_entry *rxd_get_tx_pkt(struct rxd_ep *ep);
 struct rxd_x_entry *rxd_get_tx_entry(struct rxd_ep *ep, uint32_t op);

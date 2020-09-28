@@ -558,6 +558,74 @@ size_t rxd_init_msg(void **ptr, const struct iovec *iov, size_t iov_count,
 
 	return done;
 }
+static void rxd_peer_timeout(struct rxd_ep *rxd_ep, struct rxd_peer *peer)
+{
+	struct fi_cq_err_entry err_entry;
+	struct rxd_x_entry *tx_entry;
+	struct rxd_pkt_entry *pkt_entry;
+	int ret;
+
+	while (!dlist_empty(&peer->tx_list)) {
+		dlist_pop_front(&peer->tx_list, struct rxd_x_entry, tx_entry, entry);
+		memset(&err_entry, 0, sizeof(struct fi_cq_err_entry));
+		rxd_tx_entry_free(rxd_ep, tx_entry);
+		err_entry.op_context = tx_entry->cq_entry.op_context;
+		err_entry.flags = tx_entry->cq_entry.flags;
+		err_entry.err = FI_ECONNREFUSED;
+		err_entry.prov_errno = 0;
+		ret = ofi_cq_write_error(&rxd_ep_tx_cq(rxd_ep)->util_cq, &err_entry);
+		if (ret)
+			FI_WARN(&rxd_prov, FI_LOG_EP_CTRL, "could not write error entry\n");
+	}
+
+	while (!dlist_empty(&peer->unacked)) {
+		dlist_pop_front(&peer->unacked, struct rxd_pkt_entry, pkt_entry,
+				d_entry);
+		ofi_buf_free(pkt_entry);
+	     	peer->unacked_cnt--;
+	}
+
+	dlist_remove(&peer->entry);
+}
+
+
+void rxd_ep_resend_ack(struct rxd_ep *rxd_ep, struct rxd_peer *peer)
+
+{
+	struct rxd_pkt_entry *pkt_entry;
+	struct rxd_ack_pkt *ack;
+
+/*	if (peer->ack_retry_cnt > 1000) {
+		peer->ack_retry_cnt = 0;
+		usleep(1000);
+		return;
+	}
+*/		
+	pkt_entry = rxd_get_tx_pkt(rxd_ep);
+	if (!pkt_entry) {
+		FI_WARN(&rxd_prov, FI_LOG_EP_CTRL, "Unable to resend ack\n");
+		return;
+	}
+
+	ack = (struct rxd_ack_pkt *) (pkt_entry->pkt);
+	pkt_entry->pkt_size = sizeof(*ack) + rxd_ep->tx_prefix_size;
+	pkt_entry->peer = peer->rxd_addr;
+
+	ack->base_hdr.version = RXD_PROTOCOL_VERSION;
+	ack->base_hdr.type = RXD_ACK;
+	ack->base_hdr.peer = peer->peer_addr;
+	ack->base_hdr.seq_no = peer->rx_seq_no;
+	ack->ext_hdr.rx_id = peer->rx_window;
+	peer->last_tx_ack = ack->base_hdr.seq_no;
+	peer->ack_timeout = 1000;
+
+	dlist_insert_tail(&pkt_entry->d_entry, &rxd_ep->ctrl_pkts);
+	if (rxd_ep_send_pkt(rxd_ep, pkt_entry))
+		rxd_remove_free_pkt_entry(pkt_entry);
+	else
+		peer->retry_cnt++;
+
+}
 
 void rxd_ep_send_ack(struct rxd_ep *rxd_ep, fi_addr_t peer)
 {
@@ -580,7 +648,8 @@ void rxd_ep_send_ack(struct rxd_ep *rxd_ep, fi_addr_t peer)
 	ack->base_hdr.seq_no = rxd_peer(rxd_ep, peer)->rx_seq_no;
 	ack->ext_hdr.rx_id = rxd_peer(rxd_ep, peer)->rx_window;
 	rxd_peer(rxd_ep, peer)->last_tx_ack = ack->base_hdr.seq_no;
-
+	rxd_peer(rxd_ep, peer)->ack_timeout = 1000;
+	
 	dlist_insert_tail(&pkt_entry->d_entry, &rxd_ep->ctrl_pkts);
 	if (rxd_ep_send_pkt(rxd_ep, pkt_entry))
 		rxd_remove_free_pkt_entry(pkt_entry);
@@ -918,7 +987,7 @@ struct fi_ops_cm rxd_ep_cm = {
 	.join = fi_no_join,
 };
 
-static void rxd_peer_timeout(struct rxd_ep *rxd_ep, struct rxd_peer *peer)
+/*static void rxd_peer_timeout(struct rxd_ep *rxd_ep, struct rxd_peer *peer)
 {
 	struct fi_cq_err_entry err_entry;
 	struct rxd_x_entry *tx_entry;
@@ -946,7 +1015,7 @@ static void rxd_peer_timeout(struct rxd_ep *rxd_ep, struct rxd_peer *peer)
 	}
 
 	dlist_remove(&peer->entry);
-}
+}*/
 
 static void rxd_progress_pkt_list(struct rxd_ep *ep, struct rxd_peer *peer)
 {
@@ -1008,9 +1077,16 @@ void rxd_ep_progress(struct util_ep *util_ep)
 			rxd_handle_send_comp(ep, &cq_entry);
 	}
 
-	if (!rxd_env.retry)
-		goto out;
+	if (!rxd_env.retry) {
+	dlist_foreach_container_safe(&ep->active_peers, struct rxd_peer,
+				     peer, entry, tmp){
+			if ((peer->ack_timeout) == 0)
+				rxd_ep_resend_ack(ep, peer);
 
+			peer->ack_timeout -= 1;
+		}
+		goto out;
+	}
 	ep->next_retry = -1;
 	dlist_foreach_container_safe(&ep->rts_sent_list, struct rxd_peer,
 				     peer, entry, tmp)
@@ -1195,7 +1271,14 @@ int rxd_create_peer(struct rxd_ep *ep, uint64_t rxd_addr)
 	peer->tx_window = rxd_env.max_unacked;
 	peer->unacked_cnt = 0;
 	peer->retry_cnt = 0;
-	peer->active = 0;	
+	peer->active = 0;
+
+
+	peer->ack_retry_cnt = 0;
+	peer->ack_timeout = 1000;
+	peer->rxd_addr = rxd_addr;
+
+
 	dlist_init(&(peer->unacked));
 	dlist_init(&(peer->tx_list));
 	dlist_init(&(peer->rx_list));

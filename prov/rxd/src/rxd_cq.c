@@ -990,7 +990,7 @@ static void rxd_handle_data(struct rxd_ep *ep, struct rxd_pkt_entry *pkt_entry)
 				   pkt->base_hdr.peer)->buf_pkts)))
 			rxd_progress_buf_pkts(ep, pkt->base_hdr.peer);
 	} else if (!rxd_env.retry) {
-		
+
 		if (pkt->base_hdr.seq_no > rxd_peer(ep, pkt->base_hdr.peer)->rx_seq_no) {	
 			printf("%d:data-recvd_seq_no: %lu\t",(int)getpid(), pkt->base_hdr.seq_no);
 			printf("data-expected_seq_no: %lu\n\n",  rxd_peer(ep, pkt->base_hdr.peer)->rx_seq_no);
@@ -1151,9 +1151,14 @@ static void rxd_handle_sack(struct rxd_ep *ep,
 		else if (hdr->seq_no > sack->end_seqno){
 			printf("processing sack > unacked_tail\n");
 			break;
+
 		}
 		else { 
 			printf("sack response pkt seq no: %lu\n", hdr->seq_no);
+
+		//	printf("start seq no : %lu\t", sack->start_seqno);
+		//	printf("end seq no : %lu\t", sack->end_seqno);
+		//	printf("sack response pkt seq no: %lu\n", hdr->seq_no);
 			rxd_ep_send_pkt(ep, pkt_entry);
 		}
 	
