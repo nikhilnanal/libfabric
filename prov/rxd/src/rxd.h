@@ -132,6 +132,9 @@ struct rxd_peer {
 	uint16_t tx_window;
 	int retry_cnt;
 
+	uint64_t Oorder;
+	uint64_t Inorder;
+
 	uint16_t unacked_cnt;
 	uint8_t active;
 

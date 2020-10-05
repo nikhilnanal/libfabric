@@ -1016,6 +1016,9 @@ static void rxd_handle_op(struct rxd_ep *ep, struct rxd_pkt_entry *pkt_entry)
 	int ret;
 
 	if (base_hdr->seq_no != rxd_peer(ep, base_hdr->peer)->rx_seq_no) {
+		printf("OOrder op\n");
+		printf("recvd_seq_no: %lu\t", base_hdr->seq_no);
+		printf("expected_seq_no: %lu\n\n",  rxd_peer(ep, base_hdr->peer)->rx_seq_no);
 		if (!rxd_env.retry) {
 			dlist_insert_order(&(rxd_peer(ep, base_hdr->peer)->buf_pkts),
 					   &rxd_comp_pkt_seq_no, &pkt_entry->d_entry);
