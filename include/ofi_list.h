@@ -176,12 +176,37 @@ static inline void dlist_insert_order(struct dlist_entry *head, dlist_func_t *or
 				      struct dlist_entry *entry)
 {
 	struct dlist_entry *item;
+	int ret;
 
-	item = dlist_find_first_match(head, order, entry);
-	if (item)
-		dlist_insert_before(entry, item);
-	else
+	if (dlist_empty(head)) {
 		dlist_insert_tail(entry, head);
+		return;
+	}
+	if (order(head->next, entry) > 0) {
+		dlist_insert_before(entry, head->next);
+		return;
+	} 
+	if (order(head->prev, entry) < 0) {
+		dlist_insert_after(entry, head->prev);
+		return;
+	}
+	dlist_foreach(head, item) {
+		ret = order(item, entry);
+		if (ret == 0) {		
+			return;
+		}
+		else if (ret > 0) {
+			//printf("failing in the middle\n");
+			//printf("entry:%p\t",entry);
+			//printf("listitem:%p\n", item); 
+			dlist_insert_before(entry, item);
+			return;
+		}
+		 
+	
+	}
+	 
+
 }
 
 /* splices list at the front of the list 'head'
