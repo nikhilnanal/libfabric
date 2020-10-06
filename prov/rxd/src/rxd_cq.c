@@ -160,7 +160,7 @@ static int rxd_comp_pkt_seq_no(struct dlist_entry *item, const void *arg)
 				   struct rxd_pkt_entry, d_entry));
 
 	new_hdr = rxd_get_base_hdr(container_of((struct dlist_entry *) arg,
-				  struct rxd_pkt_entry, d_entry));
+ 				  struct rxd_pkt_entry, d_entry));
 
 	return new_hdr->seq_no > list_hdr->seq_no;
 }
@@ -990,15 +990,31 @@ static void rxd_handle_data(struct rxd_ep *ep, struct rxd_pkt_entry *pkt_entry)
 				   pkt->base_hdr.peer)->buf_pkts)))
 			rxd_progress_buf_pkts(ep, pkt->base_hdr.peer);
 	} else if (!rxd_env.retry) {
-		dlist_insert_order(&(rxd_peer(ep, 
-				     pkt->base_hdr.peer)->buf_pkts),
-				   &rxd_comp_pkt_seq_no, &pkt_entry->d_entry);
-		return;
+		
+		if (pkt->base_hdr.seq_no > rxd_peer(ep, pkt->base_hdr.peer)->rx_seq_no) {	
+			printf("%d:data-recvd_seq_no: %lu\t",(int)getpid(), pkt->base_hdr.seq_no);
+			printf("data-expected_seq_no: %lu\n\n",  rxd_peer(ep, pkt->base_hdr.peer)->rx_seq_no);
+			rxd_ep_send_ack(ep, pkt->base_hdr.peer);
+
+
+		//	rxd_ep_send_sack(ep, pkt->base_hdr.peer, (rxd_peer(ep, 
+		//			 pkt->base_hdr.peer)->rx_seq_no), 
+		//			 pkt->base_hdr.seq_no - 1);
+
+			dlist_insert_order(&(rxd_peer(ep, pkt->base_hdr.peer)->buf_pkts),
+					   &rxd_comp_pkt_seq_no, &pkt_entry->d_entry);
+			return;
+		}else {
+			rxd_ep_send_ack(ep, pkt->base_hdr.peer);
+		}
 	} else if (rxd_peer(ep, pkt->base_hdr.peer)->peer_addr != 
 		   RXD_ADDR_INVALID) {
+		//printf("%d:data-recvd_seq_no: %lu\t",(int)getpid(), pkt->base_hdr.seq_no);
+		//printf("data-expected_seq_no: %lu\n\n",  rxd_peer(ep, pkt->base_hdr.peer)->rx_seq_no);
 		rxd_ep_send_ack(ep, pkt->base_hdr.peer);
 	}
 free:
+	//printf("handle_data\n");
 	ofi_buf_free(pkt_entry);
 }
 
@@ -1016,14 +1032,32 @@ static void rxd_handle_op(struct rxd_ep *ep, struct rxd_pkt_entry *pkt_entry)
 	int ret;
 
 	if (base_hdr->seq_no != rxd_peer(ep, base_hdr->peer)->rx_seq_no) {
-		printf("OOrder op\n");
-		printf("recvd_seq_no: %lu\t", base_hdr->seq_no);
-		printf("expected_seq_no: %lu\n\n",  rxd_peer(ep, base_hdr->peer)->rx_seq_no);
+		
+		//printf("%d:OOrder op\n", (int)getpid());
+
 		if (!rxd_env.retry) {
 			dlist_insert_order(&(rxd_peer(ep, base_hdr->peer)->buf_pkts),
 					   &rxd_comp_pkt_seq_no, &pkt_entry->d_entry);
-			return;
+
+			if (base_hdr->seq_no > rxd_peer(ep, base_hdr->peer)->rx_seq_no) {
+				dlist_insert_order(&(rxd_peer(ep, base_hdr->peer)->buf_pkts),
+						   &rxd_comp_pkt_seq_no, &pkt_entry->d_entry);
+				printf("%d:op-recvd_seq_no: %lu\t",(int)getpid(), base_hdr->seq_no);
+				printf("op-expected_seq_no: %lu\n\n",  rxd_peer(ep, base_hdr->peer)->rx_seq_no);
+				rxd_ep_send_ack(ep, base_hdr->peer);
+
+		//		rxd_ep_send_sack(ep, base_hdr->peer, (rxd_peer(ep, base_hdr->peer)->rx_seq_no), base_hdr->seq_no-1);
+				return;
+			}
+			else {
+				goto ack;
+			}
+			
+
 		}
+	//	printf("%d:op-recvd_seq_no: %lu\t",(int)getpid(), base_hdr->seq_no);
+	//	printf("op-expected_seq_no: %lu\n\n",  rxd_peer(ep, base_hdr->peer)->rx_seq_no);
+	
 
 		if (rxd_peer(ep, base_hdr->peer)->peer_addr != RXD_ADDR_INVALID)
 			goto ack;
@@ -1083,6 +1117,53 @@ static void rxd_handle_cts(struct rxd_ep *ep, struct rxd_pkt_entry *pkt_entry)
 	rxd_update_peer(ep, cts->rts_addr, cts->cts_addr);
 }
 
+static void rxd_handle_sack(struct rxd_ep *ep, 
+			    struct rxd_pkt_entry *sack_entry)
+{
+	struct rxd_sack_pkt *sack = (struct rxd_sack_pkt *) (sack_entry->pkt);
+	struct rxd_pkt_entry *pkt_entry;
+	struct rxd_base_hdr *hdr;
+	struct rxd_peer *peer;
+	
+	peer =  rxd_peer(ep, sack->base_hdr.peer);
+
+	if (dlist_empty(&peer->unacked)){
+		FI_WARN(&rxd_prov, FI_LOG_CQ,
+			"ERROR: recvd sack for already ack packets\n");
+		return;
+	}
+	pkt_entry = container_of((&peer->unacked)->next, struct rxd_pkt_entry, 
+				  d_entry);
+
+	while (&pkt_entry->d_entry != &peer->unacked) {
+		hdr = rxd_get_base_hdr(pkt_entry);
+		if (hdr->seq_no < sack->start_seqno) {
+			printf("processing sack < unacked_head\n");
+			if (!(pkt_entry->flags & RXD_PKT_IN_USE)) {
+				rxd_remove_free_pkt_entry(pkt_entry);
+				peer->unacked_cnt--;
+				pkt_entry = container_of((&peer->unacked)->next,
+					struct rxd_pkt_entry, d_entry);
+			}
+			continue;
+		}
+
+		else if (hdr->seq_no > sack->end_seqno){
+			printf("processing sack > unacked_tail\n");
+			break;
+		}
+		else { 
+			printf("sack response pkt seq no: %lu\n", hdr->seq_no);
+			rxd_ep_send_pkt(ep, pkt_entry);
+		}
+	
+		pkt_entry = container_of((&peer->unacked)->next,
+					struct rxd_pkt_entry, d_entry);
+
+	}
+
+}
+
 static void rxd_handle_ack(struct rxd_ep *ep, struct rxd_pkt_entry *ack_entry)
 {
 	struct rxd_ack_pkt *ack = (struct rxd_ack_pkt *) (ack_entry->pkt);
@@ -1108,8 +1189,8 @@ static void rxd_handle_ack(struct rxd_ep *ep, struct rxd_pkt_entry *ack_entry)
 				        peer)->unacked)) {
 		hdr = rxd_get_base_hdr(pkt_entry);
 		if (ofi_after_eq(hdr->seq_no, ack->base_hdr.seq_no))
-			break;
-
+				break;
+			
 		if (pkt_entry->flags & RXD_PKT_IN_USE) {
 			pkt_entry->flags |= RXD_PKT_ACKED;
 			pkt_entry = container_of((&pkt_entry->d_entry)->next,
@@ -1176,6 +1257,9 @@ void rxd_handle_recv_comp(struct rxd_ep *ep, struct fi_cq_msg_entry *comp)
 		break;
 	case RXD_ACK:
 		rxd_handle_ack(ep, pkt_entry);
+		break;
+	case RXD_SACK:
+		rxd_handle_sack(ep, pkt_entry);
 		break;
 	case RXD_DATA:
 	case RXD_DATA_READ:

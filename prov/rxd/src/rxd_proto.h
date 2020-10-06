@@ -58,6 +58,7 @@
 	FUNC(RXD_RTS),			\
 	FUNC(RXD_CTS),			\
 	FUNC(RXD_ACK),			\
+	FUNC(RXD_SACK),			\
 	FUNC(RXD_DATA),			\
 	FUNC(RXD_DATA_READ),		\
 	FUNC(RXD_NO_OP)
@@ -124,6 +125,14 @@ struct rxd_cts_pkt {
 struct rxd_ack_pkt {
 	struct rxd_base_hdr	base_hdr;
 	struct rxd_ext_hdr	ext_hdr;
+	//TODO fill in more fields? Selective ack?
+};
+
+struct rxd_sack_pkt {
+
+	struct rxd_base_hdr	base_hdr;
+	uint64_t start_seqno;
+	uint64_t end_seqno;
 	//TODO fill in more fields? Selective ack?
 };
 

@@ -92,6 +92,7 @@ struct rxd_env {
 	int retry;
 	int max_peers;
 	int max_unacked;
+	int timeout;
 };
 
 extern struct rxd_env rxd_env;
@@ -134,6 +135,8 @@ struct rxd_peer {
 
 	uint64_t Oorder;
 	uint64_t Inorder;
+
+
 
 	uint16_t unacked_cnt;
 	uint8_t active;
@@ -434,6 +437,10 @@ int rxd_av_insert_dg_addr(struct rxd_av *av, const void *addr,
 /* Pkt resource functions */
 int rxd_ep_post_buf(struct rxd_ep *ep);
 void rxd_ep_send_ack(struct rxd_ep *rxd_ep, fi_addr_t peer);
+
+void rxd_ep_send_sack(struct rxd_ep *rxd_ep, fi_addr_t peer, 
+		      uint64_t start_seqno, uint64_t end_seqno);
+
 struct rxd_pkt_entry *rxd_get_tx_pkt(struct rxd_ep *ep);
 struct rxd_x_entry *rxd_get_tx_entry(struct rxd_ep *ep, uint32_t op);
 struct rxd_x_entry *rxd_get_rx_entry(struct rxd_ep *ep, uint32_t op);

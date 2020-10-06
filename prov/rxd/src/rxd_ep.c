@@ -586,6 +586,38 @@ void rxd_ep_send_ack(struct rxd_ep *rxd_ep, fi_addr_t peer)
 		rxd_remove_free_pkt_entry(pkt_entry);
 }
 
+void rxd_ep_send_sack(struct rxd_ep *rxd_ep, fi_addr_t peer, 
+		      uint64_t start_seqno, uint64_t end_seqno) 
+{
+
+	struct rxd_pkt_entry *pkt_entry;
+	struct rxd_sack_pkt *sack;
+
+	pkt_entry = rxd_get_tx_pkt(rxd_ep);
+	if (!pkt_entry) {
+		FI_WARN(&rxd_prov, FI_LOG_EP_CTRL, "Unable to send sack\n");
+		return;
+	}
+
+	sack = (struct rxd_sack_pkt *) (pkt_entry->pkt);
+	pkt_entry->pkt_size = sizeof(*sack) + rxd_ep->tx_prefix_size;
+	pkt_entry->peer = peer;
+
+	sack->base_hdr.version = RXD_PROTOCOL_VERSION;
+	sack->base_hdr.type = RXD_SACK;
+	sack->base_hdr.peer = rxd_peer(rxd_ep, peer)->peer_addr;
+	sack->base_hdr.seq_no = start_seqno;
+
+	sack->start_seqno = start_seqno;
+	sack->end_seqno = end_seqno;
+
+	rxd_peer(rxd_ep, peer)->last_tx_ack = sack->base_hdr.seq_no;
+	dlist_insert_tail(&pkt_entry->d_entry, &rxd_ep->ctrl_pkts);
+	if (rxd_ep_send_pkt(rxd_ep, pkt_entry))
+		rxd_remove_free_pkt_entry(pkt_entry);
+
+} 
+
 static void rxd_ep_free_res(struct rxd_ep *ep)
 {
 	if (ep->tx_pkt_pool.pool)
@@ -668,8 +700,10 @@ static int rxd_ep_close(struct fid *fid)
 
 	ep = container_of(fid, struct rxd_ep, util_ep.ep_fid.fid);
 
-	dlist_foreach_container(&ep->active_peers, struct rxd_peer, peer, entry)
+	dlist_foreach_container(&ep->active_peers, struct rxd_peer, peer, entry) {
+		//printf("number of OOrder data pkts: %d\n", peer->OOOrder);
 		rxd_close_peer(ep, peer);
+	}
 
 	ret = fi_close(&ep->dg_ep->fid);
 	if (ret)
@@ -929,7 +963,7 @@ static void rxd_progress_pkt_list(struct rxd_ep *ep, struct rxd_peer *peer)
 	dlist_foreach_container(&peer->unacked, struct rxd_pkt_entry,
 				pkt_entry, d_entry) {
 		if (pkt_entry->flags & (RXD_PKT_IN_USE | RXD_PKT_ACKED) ||
-		    current < rxd_get_retry_time(pkt_entry->timestamp, peer->retry_cnt))
+		    current < rxd_get_retry_time(pkt_entry->timestamp, peer->retry_cnt) + rxd_env.timeout)
 			break;
 		retry = 1;
 		ret = rxd_ep_send_pkt(ep, pkt_entry);
@@ -1161,7 +1195,7 @@ int rxd_create_peer(struct rxd_ep *ep, uint64_t rxd_addr)
 	peer->tx_window = rxd_env.max_unacked;
 	peer->unacked_cnt = 0;
 	peer->retry_cnt = 0;
-	peer->active = 0;
+	peer->active = 0;	
 	dlist_init(&(peer->unacked));
 	dlist_init(&(peer->tx_list));
 	dlist_init(&(peer->rx_list));
@@ -1194,6 +1228,7 @@ int rxd_endpoint(struct fid_domain *domain, struct fi_info *info,
 
 	rxd_domain = container_of(domain, struct rxd_domain,
 				  util_domain.domain_fid);
+
 
 	ret = ofi_endpoint_init(domain, &rxd_util_prov, info, &rxd_ep->util_ep,
 				context, rxd_ep_progress);

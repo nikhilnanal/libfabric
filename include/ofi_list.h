@@ -39,7 +39,7 @@
 
 #include <sys/types.h>
 #include <stdlib.h>
-
+#include <stdio.h>
 #include <rdma/fabric.h>
 
 #include <ofi_signal.h>
