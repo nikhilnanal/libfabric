@@ -283,7 +283,7 @@ if __name__ == "__main__":
         # build shmem
         shmem_dir = "{}/shmem".format(install_path)
         build_shmem(shmem_dir, install_path)
-        build_ISx(shmem_dir)
+        #build_ISx(shmem_dir)
         build_PRK(shmem_dir)
         build_uh(shmem_dir)
     
