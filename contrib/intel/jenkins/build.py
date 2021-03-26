@@ -95,7 +95,7 @@ def build_ISx(shmem_dir):
     
     #common.run_command(git_cmd) 
     os.chdir('{}/ISx/SHMEM'.format(shmem_dir))
-    common.run_command(['make', 'CC={}'.format(oshcc), 'LDLIBS=-lm']) 
+    common.run_command(['make', 'CC={}'.format(oshcc), '-D_POSIX_C_SOURCE=199309L','LDLIBS=-lm']) 
                   
     
 def build_PRK(shmem_dir):
