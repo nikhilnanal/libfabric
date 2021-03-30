@@ -141,7 +141,8 @@ def build_mpi(mpi, mpisrc, mpi_install_path, libfab_install_path,  ofi_build_mod
     elif (mpi == 'mpich'):
         cmd.append("--enable-fortran=no")
         cmd.append("--with-device=ch4:ofi")
-        cmd.append("--enable-ch4-direct=netmod")
+        #cmd.append("--enable-ch4-direct=netmod")
+        cmd.append("--without-ch4-shmmods")
         
     configure_cmd = shlex.split(" ".join(cmd))
     common.run_command(configure_cmd)
@@ -272,13 +273,13 @@ if __name__ == "__main__":
             mpisrc = ci_site_config.mpich_src if mpi == 'mpich' \
                      else ci_site_config.ompi_src
             # only need to build ompi or mpich, impi is available as binary
-            build_mpi(mpi, mpisrc, mpi_install_path, install_path, ofi_build_mode)
-        
+            if (mpi != 'mpich'):
+                build_mpi(mpi, mpisrc, mpi_install_path, install_path, ofi_build_mode)    
 	# build mpich_test_suite
-        build_mpich_suite(mpi, mpi_install_path, install_path, ofi_build_mode)
+                build_mpich_suite(mpi, mpi_install_path, install_path, ofi_build_mode)
         # run stress and osu benchmarks for all mpitypes
-        build_stress_bm(mpi, mpi_install_path, install_path)
-        build_osu_bm(mpi, mpi_install_path, install_path)
+                build_stress_bm(mpi, mpi_install_path, install_path)
+                build_osu_bm(mpi, mpi_install_path, install_path)
     elif (build_item == 'shmem'):
         # build shmem
         shmem_dir = "{}/shmem".format(install_path)
