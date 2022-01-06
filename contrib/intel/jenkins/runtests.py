@@ -37,7 +37,7 @@ hosts = [node]
 # due to mpich options issues which is causing
 # multiple tests to fail.
 #mpilist = ['impi', 'mpich', 'ompi']
-mpilist = ['impi', 'ompi']
+mpilist = ['impi', 'mpich', 'ompi']
 
 #this script is executed from /tmp
 #this is done since some mpi tests

@@ -360,7 +360,7 @@ class MpiTestIMB(MpiTests):
 
     @property
     def execute_condn(self):
-        return True if (self.mpi == "impi") else False
+        return True if (self.mpi == "impi" or self.mpi == "mpich") else False
 
     def execute_cmd(self):
         command = self.cmd + self.options
