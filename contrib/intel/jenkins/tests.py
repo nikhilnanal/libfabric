@@ -340,7 +340,7 @@ class IMBrma(IMBtests):
 
     @property
     def execute_condn(self):
-        return True if (self.core_prov != "verbs") else False
+        return True
 
 
 # MpiTestIMB class inherits from the MPITests class.
