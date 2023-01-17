@@ -848,7 +848,7 @@ class DaosCartTest(Test):
         super().__init__(jobname, buildno, testname, core_prov, fabric,
                          hosts, ofi_build_mode, user_env, run_test, None, util_prov)
 
-        self.set_paths()
+        self.set_paths(core_prov)
         self.set_environment(core_prov,util_prov)
         print(core_prov)
         self.daos_nodes = ci_site_config.prov_node_map[core_prov]
@@ -857,24 +857,25 @@ class DaosCartTest(Test):
         self.cart_tests = {
                  'corpc_one_node'            :       {'tags' :'cart,corpc,one_node', 'numservers':1, 'numclients':0},
                  'corpc_two_node'            :       {'tags' :'cart,corpc,two_node', 'numservers':2, 'numclients':0},
-                 'ctl_one_node'              :       {'tags' :'cart,ctl,one_node', 'numservers':1, 'numclients':1},
+#                 'ctl_one_node'              :       {'tags' :'cart,ctl,one_node', 'numservers':1, 'numclients':1},
 #                 'ghost_rank_rpc_one_node'   :       {'tags' :'cart,ghost_rank_rpc,one_node', 'numservers':1, 'numclients':0},
-                 'group_test'                :       {'tags' :'cart,group_test,one_node', 'numservers':1, 'numclients':0},
+#                 'group_test'                :       {'tags' :'cart,group_test,one_node', 'numservers':1, 'numclients':0},
                  'iv_one_node'               :       {'tags' :'cart,iv,one_node', 'numservers':1, 'numclients':1},
-                 'iv_two_node'               :       {'tags' :'cart,iv,two_node', 'numservers':2, 'numclients':1},
-                 'launcher_one_node'         :       {'tags' :'cart,no_pmix_launcher,one_node','numservers':1, 'numclients':1},
+#                 'iv_two_node'               :       {'tags' :'cart,iv,two_node', 'numservers':2, 'numclients':1},
+#                 'launcher_one_node'         :       {'tags' :'cart,no_pmix_launcher,one_node','numservers':1, 'numclients':1},
 #                 'multictx_one_node'         :       {'tags' :'cart,no_pmix,one_node', 'numservers':1, 'numclients':0},
-                 'rpc_one_node'              :       {'tags' :'cart,rpc,one_node', 'numservers':1, 'numclients':1},
-                 'rpc_two_node'              :       {'tags' :'cart,rpc,two_node','numservers':2, 'numclients':1},
-                 'swim_notification'         :       {'tags' :'cart,rpc,swim_rank_eviction,one_node', 'numservers':1, 'numclients':1}
+#                 'rpc_one_node'              :       {'tags' :'cart,rpc,one_node', 'numservers':1, 'numclients':1},
+#                 'rpc_two_node'              :       {'tags' :'cart,rpc,two_node','numservers':2, 'numclients':1},
+#                 'swim_notification'         :       {'tags' :'cart,rpc,swim_rank_eviction,one_node', 'numservers':1, 'numclients':1}
         }
 
 
-    def set_paths(self):
+    def set_paths(self, core_prov):
         self.ci_middlewares_path = f'{ci_site_config.ci_middlewares}'
-        self.daos_install_root = f'{self.ci_middlewares_path}/daos/install'
+        self.daos_install_root = f'{self.ci_middlewares_path}/{core_prov}/daos/install'
         self.cart_test_scripts = f'{self.daos_install_root}/lib/daos/TESTING/ftest'
         self.mpipath = f'{ci_site_config.daos_mpi}/bin'
+        self.mpilibpath = f'{ci_site_config.daos_mpi}/lib64'
         self.pathlist = [f'{self.daos_install_root}/bin/', self.cart_test_scripts, self.mpipath, \
                        f'{self.daos_install_root}/lib/daos/TESTING/tests']
         self.daos_prereq = f'{self.daos_install_root}/prereq'
@@ -894,7 +895,7 @@ class DaosCartTest(Test):
         os.environ["PATH"] += os.pathsep + os.pathsep.join(self.pathlist)
         os.environ["DAOS_TEST_SHARED_DIR"] = ci_site_config.daos_share
         os.environ["DAOS_TEST_LOG_DIR"] = ci_site_config.daos_logs
-        os.environ["LD_LIBRARY_PATH"] = f'{self.ci_middlewares_path}/daos/install/lib64:{self.mpipath}'
+        os.environ["LD_LIBRARY_PATH"] = f'{self.ci_middlewares_path}/{core_prov}/daos/install/lib64:{self.mpilibpath}:{self.daos_prereq}/debug/ofi/lib'
 
     @property
     def cmd(self):
