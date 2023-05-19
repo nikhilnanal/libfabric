@@ -356,7 +356,7 @@ static int ucx_getinfo(uint32_t version, const char *node,
 	FI_WARN(&ucx_prov, FI_LOG_WARN,
 		"UCX: spawn support %d \n", ucx_descriptor.enable_spawn);
 
-	status = util_getinfo(&ucx_util_prov, version, service, node, flags,
+	status = util_getinfo(&ucx_util_prov, version, node, service, flags,
 			      hints, info);
 	if (*info) {
 		(*info)->addr_format = ucx_info.addr_format;
