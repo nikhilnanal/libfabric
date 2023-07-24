@@ -134,6 +134,10 @@ def mpich_test_suite(core, hosts, mpi, mode, user_env, util):
     print('-------------------------------------------------------------------')
     if (mpich_tests.execute_condn == True):
         print(f"Running mpichtestsuite: Spawn Tests for {core}-{util}-{fab}-{mpi}")
+        #mpich_tests.execute_cmd("attr")
+        #mpich_tests.execute_cmd("coll")
+        mpich_tests.execute_cmd("comm")
+        #mpich_tests.execute_cmd("datatype")
         mpich_tests.execute_cmd("spawn")
     else:
         print(f"Skipping {mpi.upper()} {mpich_tests.testname} as exec condn fails")
