@@ -487,9 +487,9 @@ pipeline {
         stage ('build-cuda') {
           steps {
             script {
-              slurm_build(BUILD_MODES, "cyndaquil", "cuda", "cyndaquil",
+              slurm_build(["reg"], "cyndaquil", "cuda", "cyndaquil",
                           "--cuda")
-              slurm_build(BUILD_MODES, "quilava", "cuda", "quilava",
+              slurm_build(["reg"], "quilava", "cuda", "quilava",
                           "--cuda")
             }
           }
@@ -536,6 +536,7 @@ pipeline {
               dir (CUSTOM_WORKSPACE) {
                 build("logdir")
                 build("builddir")
+                build_ci()
                 slurm_build(BUILD_MODES, "fabrics-ci", "source", "gpu")
               }
             }
@@ -594,97 +595,74 @@ pipeline {
             }
           }
         }
-        stage('tcp') {
+        stage('CI_fabtests_grass') {
+          environment {
+            build_type = "grass"
+          }
            steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("tcp", "grass", "bulbasaur", "2", "tcp")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_grass_reg_dbg",
+                       "pr_fabtests_grass_reg_dbg.json")
+                run_ci("CI_fabtests_grass_dl", "pr_fabtests_grass_dl.json")
               }
             }
           }
         }
-        stage('tcp-iouring') {
-          steps {
+        stage('CI_fabtests_shm') {
+          environment {
+            build_type = "grass"
+          }
+           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("tcp-iouring", "ivysaur", "ivysaur", "2",
-                             "tcp", null, "FI_TCP_IO_URING=1")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_shm_reg_dbg",
+                       "pr_fabtests_shm_reg_dbg.json")
+                run_ci("CI_fabtests_shm_dl", "pr_fabtests_shm_dl.json")
               }
             }
           }
         }
-        stage('verbs-rxm') {
+        stage('CI_fabtests_ivysaur') {
+          environment {
+            build_type = "ivysaur"
+          }
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("verbs-rxm", "water", "squirtle,totodile", "2",
-                             "verbs", "rxm")
-                run_fabtests("verbs-rxm", "water", "squirtle,totodile", "2",
-                             "verbs", "rxm", "FI_MR_CACHE_MAX_COUNT=0")
-                run_fabtests("verbs-rxm", "water", "squirtle,totodile", "2",
-                             "verbs", "rxm", "FI_MR_CACHE_MONITOR=userfaultfd")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_ivysaur_reg_dbg",
+                       "pr_fabtests_ivysaur_reg_dbg.json")
+                run_ci("CI_fabtests_ivysaur_dl",
+                       "pr_fabtests_ivysaur_dl.json")
               }
             }
           }
         }
-        stage('verbs-rxd') {
+        stage('CI_fabtests_verbs') {
+          environment {
+            build_type = "water"
+          }
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("verbs-rxd", "water", "squirtle", "2", "verbs",
-                             "rxd")
-                run_fabtests("verbs-rxd", "water", "squirtle", "2", "verbs",
-                             "rxd", "FI_MR_CACHE_MAX_COUNT=0")
-                run_fabtests("verbs-rxd", "water", "squirtle", "2", "verbs",
-                             "rxd", "FI_MR_CACHE_MONITOR=userfaultfd")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_verbs_reg_dbg",
+                       "pr_fabtests_verbs_reg_dbg.json")
+                run_ci("CI_fabtests_verbs_dl",
+                       "pr_fabtests_verbs_dl.json")
               }
             }
           }
         }
-        stage('udp') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_fabtests("udp", "grass", "bulbasaur", "2", "udp")
-              }
-            }
+        stage('CI_fabtests_water') {
+          environment {
+            build_type = "water"
           }
-        }
-        stage('shm') {
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("shm", "grass", "bulbasaur", "1", "shm")
-                run_fabtests("shm", "grass", "bulbasaur", "1", "shm", null,
-                            "FI_SHM_DISABLE_CMA=1")
-              }
-            }
-          }
-        }
-        stage('sockets') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_fabtests("sockets", "grass", "bulbasaur", "2", "sockets")
-              }
-            }
-          }
-        }
-        stage('ucx') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_fabtests("ucx", "ucx", "totodile", "2", "ucx")
-              }
-            }
-          }
-        }
-        stage('psm3') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_fabtests("psm3", "water", "squirtle", "2", "psm3", null,
-                             "PSM3_IDENTIFY=1")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_water_reg_dbg",
+                       "pr_fabtests_water_reg_dbg.json")
+                run_ci("CI_fabtests_water_dl", "pr_fabtests_water_dl.json")
               }
             }
           }
@@ -820,58 +798,59 @@ pipeline {
             }
           }
         }
-        stage ('cuda-shm-v1') {
+        stage ('CI_fabtests_cyndaquil') {
+          environment {
+            build_type = "cyndaquil"
+          }
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("cuda_v1_shm", "cyndaquil", "cyndaquil", "1",
-                             "shm", null, null, "h2d")
-                run_fabtests("cuda_v1_shm", "cyndaquil", "cyndaquil", "1",
-                             "shm", null, null, "d2d")
-                // run_fabtests("cuda_v1_shm", "cyndaquil", "cyndaquil", "1",
-                //              "shm", null, null, "xd2d")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_cyndaquil_reg",
+                       "pr_fabtests_cyndaquil_reg.json")
               }
             }
           }
         }
-        stage ('cuda-shm-v2') {
+        stage ('CI_fabtests_quilava') {
+          environment {
+            build_type = "quilava"
+          }
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("cuda_v2_shm", "quilava", "quilava", "1", "shm",
-                             null, null, "h2d")
-                run_fabtests("cuda_v2_shm", "quilava", "quilava", "1", "shm",
-                             null, null, "d2d")
-                // run_fabtests("cuda_v2_shm", "quilava ", "quilava", "1", "shm",
-                //              null, null, "xd2d")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_quilava_reg",
+                       "pr_fabtests_quilava_reg.json")
               }
             }
           }
         }
-        stage ('ze-shm-v3') {
+        stage ('CI_fabtests_charizard') {
           agent { node { label 'ze' } }
           options { skipDefaultCheckout() }
+          environment {
+            build_type = "source"
+          }
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("ze_v3_shm", "gpu", "fabrics-ci", "1", "shm", null,
-                             "FI_HMEM_DISABLE_P2P=1", "h2d")
-                run_fabtests("ze_v3_shm", "gpu", "fabrics-ci", "1", "shm", null,
-                             "FI_HMEM_DISABLE_P2P=1", "d2d")
-                run_fabtests("ze_v3_shm", "gpu", "fabrics-ci", "1", "shm", null,
-                             "FI_HMEM_DISABLE_P2P=1", "xd2d")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_charizard_reg",
+                       "pr_fabtests_charizard_reg.json")
+
               }
             }
           }
         }
-        stage('dsa') {
-          when { equals expected: true, actual: DO_RUN }
+        stage('CI_fabtests_electric') {
+          environment {
+            build_type = "electric"
+          }
           steps {
             script {
-              dir (RUN_LOCATION) {
-                run_fabtests("shm_dsa", "electric", "pikachu", "1", "shm", null,
-                             """FI_SHM_DISABLE_CMA=1 FI_SHM_USE_DSA_SAR=1 \
-                                FI_LOG_LEVEL=warn""")
+              dir (CI_LOCATION) {
+                run_ci("CI_fabtests_electric_reg_dbg",
+                       "pr_fabtests_electric_reg_dbg.json")
+                run_ci("CI_fabtests_electric_dl",
+                       "pr_fabtests_electric_dl.json")
               }
             }
           }
