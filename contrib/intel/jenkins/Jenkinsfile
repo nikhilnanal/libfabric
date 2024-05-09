@@ -117,7 +117,9 @@ def CI_summarize(verbose=false) {
     cmd = "${cmd} -v "
   }
 
-  run_python(PYTHON_VERSION, cmd)
+  sh """source ${CI_LOCATION}/${env.CI_MODULE}/venv/bin/activate;\
+        python ${cmd}
+  """
 }
 
 def summarize(item, verbose=false, release=false, send_mail=false) {
@@ -553,57 +555,9 @@ pipeline {
         }
       }
     }
-    stage('parallel-tests') {
+    stage('parallel-fabtests') {
       when { equals expected: true, actual: DO_RUN }
       parallel {
-        stage ('CI_mpi_verbs-rxm_imb') {
-          environment {
-            build_type = "water"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_mpi_verbs-rxm_imb", "pr_imb_water.json")
-              }
-            }
-          }
-        }
-        stage ('CI_mpi_verbs-rxm_osu') {
-          environment {
-            build_type = "water"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_mpi_verbs-rxm_osu", "pr_osu_water.json")
-              }
-            }
-          }
-        }
-        stage ('CI_mpi_tcp_imb') {
-          environment {
-            build_type = "grass"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_mpi_tcp_imb", "pr_imb_grass.json")
-              }
-            }
-          }
-        }
-        stage ('CI_mpi_tcp_osu') {
-          environment {
-            build_type = "grass"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_mpi_tcp_osu", "pr_osu_grass.json")
-              }
-            }
-          }
-        }
         stage('CI_fabtests_grass') {
           environment {
             build_type = "grass"
@@ -676,116 +630,12 @@ pipeline {
             }
           }
         }
-        stage('mpichtestsuite') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                def providers = [['tcp', null], ["verbs","rxm"]]
-                def MPIS = ["mpich"]
-                if (env.WEEKLY.toBoolean()) {
-                  MPIS = ["impi", "mpich"]
-                }
-                for (def mpi in MPIS) {
-                  run_middleware(providers, "mpichtestsuite", "mpichtestsuite",
-                                 "water", "squirtle,totodile", "2", "${mpi}")
-                }
-              }
-            }
-          }
-        }
-        stage('SHMEM_grass') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_middleware([["tcp", null]], "SHMEM", "shmem",
-                                "grass", "grass", "2")
-              }
-            }
-          }
-        }
-        stage('SHMEM_water') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_middleware([["verbs", "rxm"], ["sockets", null]], "SHMEM",
-                                "shmem", "water", "squirtle,totodile", "2")
-              }
-            }
-          }
-        }
         stage ('multinode_performance') {
           steps {
             script {
               dir (RUN_LOCATION) {
                 run_middleware([["tcp", null]], "multinode_performance",
                                "multinode", "grass", "bulbasaur", "2")
-              }
-            }
-          }
-        }
-	      stage ('oneCCL') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-		            run_middleware([["verbs", null]], "oneCCL",
-                               "oneccl", "water", "squirtle,totodile", "2")
-		            run_middleware([["shm", null]], "oneCCL",
-			                         "oneccl", "grass", "bulbasaur", "1")
-		            run_middleware([["psm3", null]], "oneCCL",
-			                         "oneccl", "water", "squirtle", "2")
-		            run_middleware([["tcp", null]], "oneCCL",
-			                         "oneccl", "grass", "bulbasaur", "2")
-                run_middleware([["shm", null]], "oneCCL_DSA",
-                               "oneccl", "electric", "pikachu", "1", null, null,
-                               """CCL_ATL_SHM=1 FI_SHM_DISABLE_CMA=1 \
-                               FI_SHM_USE_DSA_SAR=1 FI_LOG_LEVEL=warn""")
-              }
-            }
-          }
-        }
-        stage ('oneCCL-GPU-v3') {
-          agent { node { label 'ze' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-		            run_middleware([["tcp", null]], "oneCCL-GPU-v3", "onecclgpu",
-			                         "gpu", "fabrics-ci", "2", null, null,
-                               "FI_HMEM_DISABLE_P2P=1")
-		            run_middleware([["psm3", null]], "oneCCL-GPU-v3", "onecclgpu",
-			                         "gpu", "fabrics-ci", "2", null, null,
-                               "FI_HMEM_DISABLE_P2P=1")
-		            run_middleware([["verbs", null]], "oneCCL-GPU-v3", "onecclgpu",
-                               "gpu", "fabrics-ci", "2", null, null,
-                               "FI_HMEM_DISABLE_P2P=1")
-              }
-            }
-          }
-        }
-        stage('daos_tcp') {
-          agent { node { label 'daos_tcp' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_python(PYTHON_VERSION,
-                           """runtests.py --prov='tcp' --util='rxm' \
-                           --test=daos --build_hw=daos \
-                           --log_file=${env.LOG_DIR}/daos_tcp-rxm_reg""")
-              }
-            }
-          }
-        }
-         stage('daos_verbs') {
-          agent { node { label 'daos_verbs' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_python(PYTHON_VERSION,
-                           """runtests.py --prov='verbs' --util='rxm' \
-                           --test=daos --build_hw=daos \
-                           --log_file=${env.LOG_DIR}/daos_verbs-rxm_reg""")
               }
             }
           }
@@ -860,6 +710,163 @@ pipeline {
                        "pr_fabtests_electric_reg_dbg.json")
                 run_ci("CI_fabtests_electric_dl",
                        "pr_fabtests_electric_dl.json")
+              }
+            }
+          }
+        }
+      }
+    }
+    stage('parallel-middleware-tests') {
+      when { equals expected: true, actual: DO_RUN }
+      parallel {
+        stage ('CI_mpi_verbs-rxm_imb') {
+          environment {
+            build_type = "water"
+          }
+          steps {
+            script {
+              dir (CI_LOCATION) {
+                run_ci("CI_mpi_verbs-rxm_imb", "pr_imb_water.json")
+              }
+            }
+          }
+        }
+        stage ('CI_mpi_verbs-rxm_osu') {
+          environment {
+            build_type = "water"
+          }
+          steps {
+            script {
+              dir (CI_LOCATION) {
+                run_ci("CI_mpi_verbs-rxm_osu", "pr_osu_water.json")
+              }
+            }
+          }
+        }
+        stage ('CI_mpi_tcp_imb') {
+          environment {
+            build_type = "grass"
+          }
+          steps {
+            script {
+              dir (CI_LOCATION) {
+                run_ci("CI_mpi_tcp_imb", "pr_imb_grass.json")
+              }
+            }
+          }
+        }
+        stage ('CI_mpi_tcp_osu') {
+          environment {
+            build_type = "grass"
+          }
+          steps {
+            script {
+              dir (CI_LOCATION) {
+                run_ci("CI_mpi_tcp_osu", "pr_osu_grass.json")
+              }
+            }
+          }
+        }
+        stage('mpichtestsuite') {
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+                def providers = [['tcp', null], ["verbs","rxm"]]
+                def MPIS = ["mpich"]
+                if (env.WEEKLY.toBoolean()) {
+                  MPIS = ["impi", "mpich"]
+                }
+                for (def mpi in MPIS) {
+                  run_middleware(providers, "mpichtestsuite", "mpichtestsuite",
+                                 "water", "squirtle,totodile", "2", "${mpi}")
+                }
+              }
+            }
+          }
+        }
+        stage('SHMEM_grass') {
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+                run_middleware([["tcp", null]], "SHMEM", "shmem",
+                                "grass", "grass", "2")
+              }
+            }
+          }
+        }
+        stage('SHMEM_water') {
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+                run_middleware([["verbs", "rxm"], ["sockets", null]], "SHMEM",
+                                "shmem", "water", "squirtle,totodile", "2")
+              }
+            }
+          }
+        }
+        stage ('oneCCL') {
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+		            run_middleware([["verbs", null]], "oneCCL",
+                               "oneccl", "water", "squirtle,totodile", "2")
+		            run_middleware([["shm", null]], "oneCCL",
+			                         "oneccl", "grass", "bulbasaur", "1")
+		            run_middleware([["psm3", null]], "oneCCL",
+			                         "oneccl", "water", "squirtle", "2")
+		            run_middleware([["tcp", null]], "oneCCL",
+			                         "oneccl", "grass", "bulbasaur", "2")
+                run_middleware([["shm", null]], "oneCCL_DSA",
+                               "oneccl", "electric", "pikachu", "1", null, null,
+                               """CCL_ATL_SHM=1 FI_SHM_DISABLE_CMA=1 \
+                               FI_SHM_USE_DSA_SAR=1 FI_LOG_LEVEL=warn""")
+              }
+            }
+          }
+        }
+        stage ('oneCCL-GPU-v3') {
+          agent { node { label 'ze' } }
+          options { skipDefaultCheckout() }
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+		            run_middleware([["tcp", null]], "oneCCL-GPU-v3", "onecclgpu",
+			                         "gpu", "fabrics-ci", "2", null, null,
+                               "FI_HMEM_DISABLE_P2P=1")
+		            run_middleware([["psm3", null]], "oneCCL-GPU-v3", "onecclgpu",
+			                         "gpu", "fabrics-ci", "2", null, null,
+                               "FI_HMEM_DISABLE_P2P=1")
+		            run_middleware([["verbs", null]], "oneCCL-GPU-v3", "onecclgpu",
+                               "gpu", "fabrics-ci", "2", null, null,
+                               "FI_HMEM_DISABLE_P2P=1")
+              }
+            }
+          }
+        }
+        stage('daos_tcp') {
+          agent { node { label 'daos_tcp' } }
+          options { skipDefaultCheckout() }
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+                run_python(PYTHON_VERSION,
+                           """runtests.py --prov='tcp' --util='rxm' \
+                           --test=daos --build_hw=daos \
+                           --log_file=${env.LOG_DIR}/daos_tcp-rxm_reg""")
+              }
+            }
+          }
+        }
+        stage('daos_verbs') {
+          agent { node { label 'daos_verbs' } }
+          options { skipDefaultCheckout() }
+          steps {
+            script {
+              dir (RUN_LOCATION) {
+                run_python(PYTHON_VERSION,
+                           """runtests.py --prov='verbs' --util='rxm' \
+                           --test=daos --build_hw=daos \
+                           --log_file=${env.LOG_DIR}/daos_verbs-rxm_reg""")
               }
             }
           }
