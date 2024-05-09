@@ -173,7 +173,7 @@ def checkout_ci_resources() {
       rm -rf ${env.WORKSPACE}/ci_resources && mkdir ${env.WORKSPACE}/ci_resources
     fi
 
-    git clone -b main ${env.ZDWORKIN_CI_RESOURCES} ${env.WORKSPACE}/ci_resources
+    git clone -b main ${env.NNANAL_CI_RESOURCES} ${env.WORKSPACE}/ci_resources
 
   """
 }
@@ -186,7 +186,7 @@ def checkout_ci() {
       rm -rf ${env.WORKSPACE}/ci && mkdir ${env.WORKSPACE}/ci
     fi
 
-    git clone --recurse-submodules ${env.ZDWORKIN_CI} ${env.WORKSPACE}/ci
+    git clone --recurse-submodules ${env.NNANAL_CI} ${env.WORKSPACE}/ci
   """
 }
 
@@ -445,16 +445,6 @@ pipeline {
           steps {
             script {
               slurm_build(BUILD_MODES, "water", "water", "water")
-              slurm_batch("squirtle,totodile", "1",
-                            "${env.LOG_DIR}/build_mpich_water_log",
-                            """python$PYTHON_VERSION ${RUN_LOCATION}/build.py \
-                              --build_item=mpich --build_hw=water"""
-                          )
-              slurm_batch("water", "1",
-                          "${env.LOG_DIR}/build_shmem_water_log",
-                          """python$PYTHON_VERSION ${RUN_LOCATION}/build.py \
-                              --build_item=shmem --build_hw=water"""
-                         )
             }
           }
         }
@@ -465,91 +455,6 @@ pipeline {
           steps {
             script {
               slurm_build(BUILD_MODES, "grass", "grass", "grass")
-              slurm_batch("grass", "1",
-                            "${env.LOG_DIR}/build_mpich_grass_log",
-                            """python$PYTHON_VERSION ${RUN_LOCATION}/build.py \
-                              --build_item=mpich --build_hw=grass"""
-                          )
-              slurm_batch("grass", "1",
-                          "${env.LOG_DIR}/build_shmem_grass_log",
-                          """python$PYTHON_VERSION ${RUN_LOCATION}/build.py \
-                              --build_item=shmem --build_hw=grass"""
-                         )
-            }
-          }
-        }
-        stage ('build-electric') {
-          environment {
-            build_type = "electric"
-          }
-          steps {
-            script {
-              slurm_build(BUILD_MODES, "electric", "electric", "electric")
-            }
-          }
-        }
-        stage ('build-ucx') {
-          steps {
-            script {
-              slurm_build(BUILD_MODES, "totodile", "ucx", "ucx")
-            }
-          }
-        }
-        stage ('build-cuda') {
-          steps {
-            script {
-              slurm_build(["reg"], "cyndaquil", "cuda", "cyndaquil",
-                          "--cuda")
-              slurm_build(["reg"], "quilava", "cuda", "quilava",
-                          "--cuda")
-            }
-          }
-        }
-        stage ('build-iouring') {
-          steps {
-            script {
-              slurm_build(BUILD_MODES, "ivysaur", "iouring", "ivysaur")
-            }
-          }
-        }
-        stage ('build-daos') {
-          agent {
-            node {
-              label 'daos_head'
-              customWorkspace CUSTOM_WORKSPACE
-            }
-          }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir ("${CUSTOM_WORKSPACE}/source/libfabric") { checkout scm }
-              checkout_external_resources()
-              dir (CUSTOM_WORKSPACE) {
-                build("logdir")
-                build("libfabric", "reg", "daos")
-                build("fabtests", "reg", "daos")
-              }
-            }
-          }
-        }
-        stage ('build-gpu') {
-          agent {
-            node {
-              label 'ze'
-              customWorkspace CUSTOM_WORKSPACE
-            }
-          }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir ("${CUSTOM_WORKSPACE}/source/libfabric") { checkout scm }
-              checkout_external_resources()
-              dir (CUSTOM_WORKSPACE) {
-                build("logdir")
-                build("builddir")
-                build_ci()
-                slurm_build(BUILD_MODES, "fabrics-ci", "source", "gpu")
-              }
             }
           }
         }
@@ -558,315 +463,30 @@ pipeline {
     stage('parallel-fabtests') {
       when { equals expected: true, actual: DO_RUN }
       parallel {
-        stage('CI_fabtests_grass') {
-          environment {
-            build_type = "grass"
-          }
-           steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_grass_reg_dbg",
-                       "pr_fabtests_grass_reg_dbg.json")
-                run_ci("CI_fabtests_grass_dl", "pr_fabtests_grass_dl.json")
-              }
-            }
-          }
-        }
-        stage('CI_fabtests_shm') {
-          environment {
-            build_type = "grass"
-          }
-           steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_shm_reg_dbg",
-                       "pr_fabtests_shm_reg_dbg.json")
-                run_ci("CI_fabtests_shm_dl", "pr_fabtests_shm_dl.json")
-              }
-            }
-          }
-        }
-        stage('CI_fabtests_ivysaur') {
-          environment {
-            build_type = "ivysaur"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_ivysaur_reg_dbg",
-                       "pr_fabtests_ivysaur_reg_dbg.json")
-                run_ci("CI_fabtests_ivysaur_dl",
-                       "pr_fabtests_ivysaur_dl.json")
-              }
-            }
-          }
-        }
-        stage('CI_fabtests_verbs') {
-          environment {
-            build_type = "water"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_verbs_reg_dbg",
-                       "pr_fabtests_verbs_reg_dbg.json")
-                run_ci("CI_fabtests_verbs_dl",
-                       "pr_fabtests_verbs_dl.json")
-              }
-            }
-          }
-        }
-        stage('CI_fabtests_water') {
-          environment {
-            build_type = "water"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_water_reg_dbg",
-                       "pr_fabtests_water_reg_dbg.json")
-                run_ci("CI_fabtests_water_dl", "pr_fabtests_water_dl.json")
-              }
-            }
-          }
-        }
-        stage ('multinode_performance') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_middleware([["tcp", null]], "multinode_performance",
-                               "multinode", "grass", "bulbasaur", "2")
-              }
-            }
-          }
-        }
-        stage ('DMABUF-Tests') {
-          agent { node { label 'ze' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                dmabuf_output = "${LOG_DIR}/DMABUF-Tests_verbs-rxm_dmabuf"
-                cmd = """ python3.9 runtests.py --test=dmabuf \
-                           --prov=verbs --util=rxm --build_hw=gpu"""
-                slurm_batch("fabrics-ci", "1", "${dmabuf_output}_1_reg",
-                            "${cmd}")
-                slurm_batch("fabrics-ci", "2", "${dmabuf_output}_2_reg",
-                            "${cmd}")
-              }
-            }
-          }
-        }
-        stage ('CI_fabtests_cyndaquil') {
-          environment {
-            build_type = "cyndaquil"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_cyndaquil_reg",
-                       "pr_fabtests_cyndaquil_reg.json")
-              }
-            }
-          }
-        }
-        stage ('CI_fabtests_quilava') {
-          environment {
-            build_type = "quilava"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_quilava_reg",
-                       "pr_fabtests_quilava_reg.json")
-              }
-            }
-          }
-        }
-        stage ('CI_fabtests_charizard') {
-          agent { node { label 'ze' } }
-          options { skipDefaultCheckout() }
-          environment {
-            build_type = "source"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_charizard_reg",
-                       "pr_fabtests_charizard_reg.json")
+        stage ('CI_multinode_performance_water') {
 
-              }
-            }
-          }
-        }
-        stage('CI_fabtests_electric') {
-          environment {
-            build_type = "electric"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_fabtests_electric_reg_dbg",
-                       "pr_fabtests_electric_reg_dbg.json")
-                run_ci("CI_fabtests_electric_dl",
-                       "pr_fabtests_electric_dl.json")
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('parallel-middleware-tests') {
-      when { equals expected: true, actual: DO_RUN }
-      parallel {
-        stage ('CI_mpi_verbs-rxm_imb') {
           environment {
             build_type = "water"
           }
           steps {
             script {
               dir (CI_LOCATION) {
-                run_ci("CI_mpi_verbs-rxm_imb", "pr_imb_water.json")
+                run_ci("CI_multinode_performance_water_reg",
+                       "pr_multinode_performance_water_reg.json")
               }
             }
           }
         }
-        stage ('CI_mpi_verbs-rxm_osu') {
-          environment {
-            build_type = "water"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_mpi_verbs-rxm_osu", "pr_osu_water.json")
-              }
-            }
-          }
-        }
-        stage ('CI_mpi_tcp_imb') {
+        stage ('CI_multinode_performance_grass') {
+
           environment {
             build_type = "grass"
           }
           steps {
             script {
               dir (CI_LOCATION) {
-                run_ci("CI_mpi_tcp_imb", "pr_imb_grass.json")
-              }
-            }
-          }
-        }
-        stage ('CI_mpi_tcp_osu') {
-          environment {
-            build_type = "grass"
-          }
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                run_ci("CI_mpi_tcp_osu", "pr_osu_grass.json")
-              }
-            }
-          }
-        }
-        stage('mpichtestsuite') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                def providers = [['tcp', null], ["verbs","rxm"]]
-                def MPIS = ["mpich"]
-                if (env.WEEKLY.toBoolean()) {
-                  MPIS = ["impi", "mpich"]
-                }
-                for (def mpi in MPIS) {
-                  run_middleware(providers, "mpichtestsuite", "mpichtestsuite",
-                                 "water", "squirtle,totodile", "2", "${mpi}")
-                }
-              }
-            }
-          }
-        }
-        stage('SHMEM_grass') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_middleware([["tcp", null]], "SHMEM", "shmem",
-                                "grass", "grass", "2")
-              }
-            }
-          }
-        }
-        stage('SHMEM_water') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_middleware([["verbs", "rxm"], ["sockets", null]], "SHMEM",
-                                "shmem", "water", "squirtle,totodile", "2")
-              }
-            }
-          }
-        }
-        stage ('oneCCL') {
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-		            run_middleware([["verbs", null]], "oneCCL",
-                               "oneccl", "water", "squirtle,totodile", "2")
-		            run_middleware([["shm", null]], "oneCCL",
-			                         "oneccl", "grass", "bulbasaur", "1")
-		            run_middleware([["psm3", null]], "oneCCL",
-			                         "oneccl", "water", "squirtle", "2")
-		            run_middleware([["tcp", null]], "oneCCL",
-			                         "oneccl", "grass", "bulbasaur", "2")
-                run_middleware([["shm", null]], "oneCCL_DSA",
-                               "oneccl", "electric", "pikachu", "1", null, null,
-                               """CCL_ATL_SHM=1 FI_SHM_DISABLE_CMA=1 \
-                               FI_SHM_USE_DSA_SAR=1 FI_LOG_LEVEL=warn""")
-              }
-            }
-          }
-        }
-        stage ('oneCCL-GPU-v3') {
-          agent { node { label 'ze' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-		            run_middleware([["tcp", null]], "oneCCL-GPU-v3", "onecclgpu",
-			                         "gpu", "fabrics-ci", "2", null, null,
-                               "FI_HMEM_DISABLE_P2P=1")
-		            run_middleware([["psm3", null]], "oneCCL-GPU-v3", "onecclgpu",
-			                         "gpu", "fabrics-ci", "2", null, null,
-                               "FI_HMEM_DISABLE_P2P=1")
-		            run_middleware([["verbs", null]], "oneCCL-GPU-v3", "onecclgpu",
-                               "gpu", "fabrics-ci", "2", null, null,
-                               "FI_HMEM_DISABLE_P2P=1")
-              }
-            }
-          }
-        }
-        stage('daos_tcp') {
-          agent { node { label 'daos_tcp' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_python(PYTHON_VERSION,
-                           """runtests.py --prov='tcp' --util='rxm' \
-                           --test=daos --build_hw=daos \
-                           --log_file=${env.LOG_DIR}/daos_tcp-rxm_reg""")
-              }
-            }
-          }
-        }
-        stage('daos_verbs') {
-          agent { node { label 'daos_verbs' } }
-          options { skipDefaultCheckout() }
-          steps {
-            script {
-              dir (RUN_LOCATION) {
-                run_python(PYTHON_VERSION,
-                           """runtests.py --prov='verbs' --util='rxm' \
-                           --test=daos --build_hw=daos \
-                           --log_file=${env.LOG_DIR}/daos_verbs-rxm_reg""")
+                run_ci("CI_multinode_performance_grass_reg",
+                       "pr_multinode_performance_grass_reg.json")
               }
             }
           }
@@ -877,17 +497,7 @@ pipeline {
       when { equals expected: true, actual: DO_RUN }
       steps {
         script {
-          gather_logs("${env.DAOS_ADDR}", "${env.DAOS_KEY}", "${env.LOG_DIR}",
-                      "${env.LOG_DIR}")
-          gather_logs("${env.ZE_ADDR}", "${env.ZE_KEY}", "${env.LOG_DIR}",
-                      "${env.LOG_DIR}")
-
-          summarize("all", verbose=false, release=RELEASE,
-                    send_mail=env.WEEKLY.toBoolean())
           CI_summarize(verbose=false)
-          if (RELEASE) {
-            save_summary()
-          }
         }
       }
     }
@@ -896,37 +506,8 @@ pipeline {
   post {
     always {
       script {
-        summarize("all")
         CI_summarize(verbose=true)
       }
-    }
-    success {
-      script {
-        summarize("all", verbose=true, release=false,
-        send_mail=env.WEEKLY.toBoolean())
-        CI_summarize(verbose=true)
-      }
-    }
-    aborted {
-      node ('daos_head') {
-        dir ("${DELETE_LOCATION}/middlewares") { deleteDir() }
-      }
-      node ('ze') {
-        dir ("${DELETE_LOCATION}/middlewares") { deleteDir() }
-      }
-      dir ("${DELETE_LOCATION}/middlewares") { deleteDir() }
-    }
-    cleanup {
-      node ('daos_head') {
-        dir("${env.WORKSPACE}") { deleteDir() }
-        dir("${env.WORKSPACE}@tmp") { deleteDir() }
-      }
-      node ('ze') {
-        dir("${env.WORKSPACE}") { deleteDir() }
-        dir("${env.WORKSPACE}@tmp") { deleteDir() }
-      }
-      dir("${env.WORKSPACE}") { deleteDir() }
-      dir("${env.WORKSPACE}@tmp") { deleteDir() }
     }
   }
 }
