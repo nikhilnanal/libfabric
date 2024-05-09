@@ -111,6 +111,15 @@ def gather_logs(cluster, key, dest, source) {
   }
 }
 
+def CI_summarize(verbose=false) {
+  def cmd = "${CI_LOCATION}/summarize.py --log_directory=${env.LOG_DIR}"
+  if (verbose) {
+    cmd = "${cmd} -v "
+  }
+
+  run_python(PYTHON_VERSION, cmd)
+}
+
 def summarize(item, verbose=false, release=false, send_mail=false) {
   def cmd = "${RUN_LOCATION}/summary.py --summary_item=all"
   if (verbose) {
@@ -868,6 +877,7 @@ pipeline {
 
           summarize("all", verbose=false, release=RELEASE,
                     send_mail=env.WEEKLY.toBoolean())
+          CI_summarize(verbose=false)
           if (RELEASE) {
             save_summary()
           }
@@ -880,12 +890,14 @@ pipeline {
     always {
       script {
         summarize("all")
+        CI_summarize(verbose=true)
       }
     }
     success {
       script {
         summarize("all", verbose=true, release=false,
         send_mail=env.WEEKLY.toBoolean())
+        CI_summarize(verbose=true)
       }
     }
     aborted {
