@@ -49,5 +49,36 @@
 #include <rdma/fi_trigger.h>
 #include <rdma/providers/fi_prov.h>
 
+#include <ofi.h>
+#include <ofi_enosys.h>
+#include <ofi_rbuf.h>
+#include <ofi_list.h>
+#include <ofi_signal.h>
+#include <ofi_epoll.h>
+#include <ofi_util.h>
+#include <ofi_atomic.h>
+#include <ofi_iov.h>
+#include <ofi_mr.h>
+#include <ofi_lock.h>
+
+
+
+extern struct fi_provider xxx_prov;
+extern struct fi_info xxx_info;
+extern struct util_prov xxx_util_prov;
+
 int xxx_fabric(struct fi_fabric_attr *attr, struct fid_fabric **fabric,
 	       void *context);
+int xxx_av_open(struct fid_domain *domain_fid, struct fi_av_attr *attr,
+		struct fid_av **fid_av, void *context);
+int xnet_cq_open(struct fid_domain *domain, struct fi_cq_attr *attr,
+		 struct fid_cq **cq_fid, void *context);
+int xxx_endpoint(struct fid_domain *domain, struct fi_info *info,
+	         struct fid_ep **ep_fid, void *context);
+int xxx_cntr_open(struct fid_domain *domain, struct fi_cntr_attr *attr,
+		  struct fid_cntr **cntr_fid, void *context);
+int  xxx_srx_context (struct fid_domain *domain, struct fi_rx_attr *attr,
+		      struct fid_ep **rx_ep, void *context);
+		      	 		 	
+int  xxx_srx_context (struct fid_domain *domain, struct fi_rx_attr *attr,
+		      struct fid_ep **rx_ep, void *context);

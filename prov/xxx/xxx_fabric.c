@@ -30,8 +30,58 @@
  * SOFTWARE.
  */
 
+#include "xxx.h"
+
+static int xxx_wait_open(struct fid_fabric *fabric_fid,
+			 struct fi_wait_attr *attr,
+			 struct fid_wait **waitset)
+{
+        return fi_no_wait_open(fabric, attr, waitset);
+}
+
+static struct fi_ops_fabric xxx_fabric_ops = {
+	.size = sizeof(struct fi_ops_fabric),
+	.domain = xxx_domain_open,
+	.passive_ep = xxx_passive_ep,
+	.eq_open = xxx_eq_create,
+	.wait_open = xxx_wait_open,
+	.trywait = xxx_trywait
+};
+
+static int xxx_fabric_close(fid_t fid) 
+{
+        return -FI_ENOSYS;
+}
+
+static int xxx_bind(struct fid *fid, struct fid *bfid, uint64_t flags)
+{
+        return fi_no_bind(fid, bfid, flags);
+}
+
+static int xxx_control(struct fid *fid, int command, void *arg)
+{
+        return fi_no_control(fid, command, arg);
+}
+
+static int xxx_ops_open(struct fid *fid, const char *name, uint64_t flags, 
+                        void **ops, void *context)
+{
+        return fi_no_ops_open(fid, name, flags, ops, context);
+}
+
+static struct fi_ops xxx_fabric_fi_ops = {
+	.size = sizeof(struct fi_ops),
+	.close = xxx_fabric_close,
+	.bind = xxx_bind,
+	.control = xxx_control,
+	.ops_open = xxx_ops_open,
+        .tostr = fi_no_tostr,
+        .ops_set =  fi_no_ops_set
+};
+
 int xxx_fabric(struct fi_fabric_attr *attr, struct fid_fabric **fabric,
 	       void *context)
 {
         return -FI_ENOSYS;
 }
+

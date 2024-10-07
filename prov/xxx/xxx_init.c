@@ -58,8 +58,15 @@ struct fi_provider xxx_prov = {
         .cleanup = xxx_fini,
 };
 
+struct util_prov xxx_util_prov = {
+	.prov = &xxx_prov,
+	.info = &xxx_info,
+	.flags = 0
+};
+
 /* TODO: Add macro include/ofi_prov.h */
 XXX_INI
 {
         return &xxx_prov;
 }
+

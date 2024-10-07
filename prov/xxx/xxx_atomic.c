@@ -29,3 +29,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#include "xxx.h"
+
+int xxx_query_atomic(struct fid_domain *domain, enum fi_datatype datatype,
+		     enum fi_op op, struct fi_atomic_attr *attr, uint64_t flags)
+{
+        return fi_no_query_atomic(domain, datatype, op, attr, flags);
+}

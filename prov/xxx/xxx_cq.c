@@ -29,3 +29,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#include "xxx.h"
+
+int xnet_cq_open(struct fid_domain *domain, struct fi_cq_attr *attr,
+		 struct fid_cq **cq_fid, void *context)
+{
+        return fi_no_cq_open(domain, attr, cq_fid, context);
+}
