@@ -1,0 +1,7 @@
+if ENABLE_TCP
+bin_PROGRAMS += prov/tcp/src/fi_tcp_no_connect
+prov_tcp_src_fi_tcp_no_connect_SOURCES = \
+	prov/tcp/src/tcp_no_connect.c
+prov_tcp_src_fi_tcp_no_connect_LDADD = libfabtests.la
+
+endif ENABLE_TCP

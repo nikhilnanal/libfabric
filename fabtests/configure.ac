@@ -54,6 +54,13 @@ AS_IF([test x"$enable_debug" != x"no"],
 AC_DEFINE_UNQUOTED([ENABLE_DEBUG], [$dbg],
 	[defined to 1 if configured with --enable-debug])
 
+AC_ARG_ENABLE([tcp],
+	[AS_HELP_STRING([--enable-tcp],
+		[Enable tcp provider specific tests - default YES])],
+	[], [enable_tcp=yes])
+
+AM_CONDITIONAL([ENABLE_TCP], [test x"$enable_tcp" = x"yes"])
+
 AC_ARG_ENABLE([efa],
 	[AS_HELP_STRING([--enable-efa],
 		[Enable efa provider specific tests - default YES])],
