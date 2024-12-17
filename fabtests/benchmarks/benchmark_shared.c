@@ -425,7 +425,7 @@ static int rma_bw_rx_comp()
 	return ft_tx(ep, remote_fi_addr, FT_RMA_SYNC_MSG_BYTES, &tx_ctx);
 }
 
-static int set_fi_more_flag(int i, int j, int flags)
+static uint64_t set_fi_more_flag(int i, int j, int flags)
 {
 	if (j < opts.window_size - 1 && i >= opts.warmup_iterations &&
 	    i < opts.iterations + opts.warmup_iterations - 1) {
