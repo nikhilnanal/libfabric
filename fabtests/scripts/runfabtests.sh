@@ -292,6 +292,9 @@ prov_efa_tests=( \
 	"fi_efa_rnr_queue_resend -c 1 -A write -U -S 4"
 )
 
+prov_tcp_tests=( \
+	"fi_tcp_no_connect"
+)
 function errcho {
 	>&2 echo $*
 }
@@ -761,6 +764,13 @@ function prov_efa_test {
 	for test in "${prov_efa_tests[@]}"; do
 		cs_test "$test"
 	done
+}
+
+function prov_tcp_test {
+	for test in "${prov_tcp_tests[@]}"; do
+		cs_test "$test"
+	done
+
 }
 
 function set_core_util {
