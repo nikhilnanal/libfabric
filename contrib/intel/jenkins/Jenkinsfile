@@ -584,28 +584,20 @@ pipeline {
             }
           }
         }
-        stage ('mpich-water') {
-          steps {
-            script {
-              dir (CI_LOCATION) {
-                slurm_batch("water", "1",
-                            "${env.LOG_DIR}/build_mpich_water_log",
-                            """python$PYTHON_VERSION ${RUN_LOCATION}/build.py \
-                              --build_item=mpich --build_hw=water"""
-                           )
-              }
-            }
-          }
-        }
         stage ('mpich-grass') {
           steps {
             script {
               dir (CI_LOCATION) {
-                slurm_batch("grass", "1",
-                            "${env.LOG_DIR}/build_mpich_grass_log",
-                            """python$PYTHON_VERSION ${RUN_LOCATION}/build.py \
-                              --build_item=mpich --build_hw=grass"""
-                           )
+                build_ci("pr_build_mpich_grass.json")
+              }
+            }
+          }
+        }
+        stage ('mpich-water') {
+          steps {
+            script {
+              dir (CI_LOCATION) {
+                build_ci("pr_build_mpich_water.json")
               }
             }
           }
@@ -618,16 +610,8 @@ pipeline {
         stage('mpichtestsuite-tcp') {
           steps {
             script {
-              dir (RUN_LOCATION) {
-                def providers = [['tcp', null]]
-                def MPIS = ["mpich"]
-                if (env.WEEKLY.toBoolean()) {
-                  MPIS = ["impi", "mpich"]
-                }
-                for (def mpi in MPIS) {
-                  run_middleware(providers, "mpichtestsuite", "mpichtestsuite",
-                                 "grass", "bulbasaur,ivysaur", "2", "${mpi}")
-                }
+              dir (CI_LOCATION) {
+                run_ci("CI_mpi_tcp_mpichtestsuite", "pr_mpichtestsuite_water.json")
               }
             }
           }
@@ -635,17 +619,8 @@ pipeline {
         stage('mpichtestsuite-verbs') {
           steps {
             script {
-              dir (RUN_LOCATION) {
-                def providers = [["verbs","rxm"]]
-                def MPIS = ["mpich"]
-                if (env.WEEKLY.toBoolean()) {
-                  MPIS = ["impi", "mpich"]
-                }
-                for (def mpi in MPIS) {
-                  run_middleware(providers, "mpichtestsuite", "mpichtestsuite",
-                                 "water", "squirtle,wartortle,articuno", "2",
-                                 "${mpi}")
-                }
+              dir (CI_LOCATION) {
+                run_ci("CI_mpi_verbs-rxm_mpichtestsuite", "pr_mpichtestsuite_water.json")
               }
             }
           }
